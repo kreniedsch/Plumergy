@@ -77,6 +77,37 @@ input[type=date].inp{min-height:48px}
 }
 .bodymini{max-width:260px;margin:0 auto;width:100%}
 .mdot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:0}
+.agrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.abox{background:var(--surface2);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:3px;min-width:0}
+.abox b{font-family:var(--round);font-weight:800;font-size:26px;line-height:1.1}
+.abox b small{font-size:13px;color:var(--muted);font-weight:600}
+.abox .ml,.vbox .ml{font-size:11px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.abox .md{font-size:11px;color:var(--muted)}
+.apill{font-size:12px;font-weight:800}
+.gauge{position:relative;height:8px;margin:6px 0 2px}
+.gbar{position:absolute;inset:0;border-radius:4px;opacity:.85}
+.gauge i{position:absolute;top:50%;width:14px;height:14px;border-radius:50%;background:var(--surface);border:3px solid;transform:translate(-50%,-50%)}
+.vbox{background:var(--surface2);border-radius:16px;padding:12px;margin-top:10px}
+.vbox p,.vbox .why,.vbox .why p{font-size:13px!important;line-height:1.45}
+.ptab{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.prow{display:grid;grid-template-columns:1.3fr 1fr 18px 1fr;align-items:baseline;gap:6px;font-size:14px}
+.prow span:nth-child(2),.prow span:nth-child(4){font-family:var(--round);font-weight:800;text-align:right}
+.prow.phead span{font-size:11px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-family:inherit}
+.parr{color:var(--muted);text-align:center}
+.plan{display:flex;flex-direction:column;gap:2px;border-radius:14px;padding:10px 12px;margin-top:8px;font-size:13px;background:rgba(110,240,176,.1)}
+.plan b{font-size:14px}
+.plan-ok b{color:#6EF0B0}.plan-warn{background:rgba(255,214,10,.1)}.plan-warn b{color:var(--carb)}.plan-bad{background:rgba(255,59,48,.12)}.plan-bad b{color:var(--over)}
+.calcres{background:var(--surface2);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:6px}
+.crow{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:14px}
+.crow small{color:var(--muted);font-size:11px;margin-left:4px}
+.crow b{font-family:var(--round);font-weight:800;font-size:17px}
+.crow.big{border-top:1px solid var(--line);padding-top:8px;margin-top:4px}
+.crow.big span{font-weight:700}
+.crow.big b{font-size:26px;color:var(--kcal)}
+.why{margin-top:8px;font-size:13px;color:var(--muted)}
+.why summary{cursor:pointer;color:var(--ink);font-weight:700}
+.why p{margin:8px 0 0;line-height:1.45}
+.chip small{font-weight:600}
 .mhow{font-size:11px;color:var(--muted);line-height:1.3}
 .mfields .field label{display:flex;align-items:center}
 button.mtile{border:0;text-align:left;color:inherit;font:inherit;cursor:pointer}
@@ -163,6 +194,7 @@ button.mtile{border:0;text-align:left;color:inherit;font:inherit;cursor:pointer}
 .backdrop{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:10;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
 .sheet{position:fixed;left:0;right:0;bottom:0;z-index:11;background:#1B1520;border-radius:28px 28px 0 0;max-height:92%;display:flex;flex-direction:column;max-width:600px;margin:0 auto}
 .sheet-h{padding:10px 16px 10px;display:flex;flex-direction:column;gap:10px}
+.sheet-b > *{flex-shrink:0}
 .grab{width:38px;height:5px;border-radius:3px;background:var(--surface3);margin:0 auto}
 .sheet-t{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .sheet-t h3{margin:0;font-family:var(--display);font-style:italic;font-weight:800;text-transform:uppercase;font-size:28px;line-height:1}
@@ -618,6 +650,102 @@ function measCardHTML(){
     <p class="hint" style="margin:4px 0 0">${any?"Tippe auf einen Ring und der Muskel pumpt. Nochmal tippen oder die Kachel wählen, um zu messen.":"Tippe auf einen Ring, um den Muskel zu sehen, und nochmal, um dein erstes Mass einzutragen. Miss alle 2–4 Wochen, morgens vor dem Essen, immer am gleichen Punkt. So siehst du Muskelaufbau, auch wenn die Waage stillsteht."}</p>
     <div class="bodywrap">${bodySVG({focus:selMeas})}</div><div class="mgrid">${tiles}</div></section>`;
 }
+/* ---------- Körperanalyse ---------- */
+function latestMeasure(k){const s=measSeries(k);return s.length?s[s.length-1][1]:null}
+function currentWeight(){const w=Object.entries(state.weights).filter(([d,v])=>v>0).sort((a,b)=>a[0]<b[0]?-1:1);if(w.length)return w[w.length-1][1];const p=state.settings.profile;return p&&p.w?+p.w:null}
+function bmiCat(b){return b<18.5?["Untergewicht","var(--fat)"]:b<25?["Normalgewicht","#6EF0B0"]:b<30?["Übergewicht","var(--carb)"]:["Adipositas","var(--over)"]}
+function bfCat(sex,bf){const t=sex==="f"?[[14,"Sehr niedrig"],[21,"Athletisch"],[25,"Fit"],[32,"Durchschnitt"],[99,"Erhöht"]]:[[6,"Sehr niedrig"],[14,"Athletisch"],[18,"Fit"],[25,"Durchschnitt"],[99,"Erhöht"]];const c=["var(--carb)","#6EF0B0","#6EF0B0","var(--carb)","var(--over)"];for(let i=0;i<t.length;i++)if(bf<t[i][0])return [t[i][1],c[i]];return ["Erhöht","var(--over)"]}
+function bodyComp(){
+  const p=state.settings.profile||{};
+  const sex=p.sex||"m",age=+p.age||null,h=+p.h||null,w=currentWeight();
+  if(!h||!w||!age) return null;
+  const hm=h/100,bmi=w/(hm*hm);
+  const neck=latestMeasure("nacken"),belly=latestMeasure("bauch"),waist=latestMeasure("taille"),hip=latestMeasure("po")||latestMeasure("huefte");
+  let bf=null,src="",acc="";
+  if(p.bf&&+p.bf>=3){bf=+p.bf;src="deine Angabe";acc=""}
+  else{
+    const L=Math.log10;
+    if(sex==="m"&&neck&&(belly||waist)&&(belly||waist)>neck){bf=495/(1.0324-0.19077*L((belly||waist)-neck)+0.15456*L(h))-450;src="Navy-Methode (Umfänge)";acc="±3–4 %"}
+    else if(sex==="f"&&neck&&(waist||belly)&&hip){bf=495/(1.29579-0.35004*L((waist||belly)+hip-neck)+0.22100*L(h))-450;src="Navy-Methode (Umfänge)";acc="±3–4 %"}
+    else{bf=1.2*bmi+0.23*age-10.8*(sex==="m"?1:0)-5.4;src="grobe Schätzung aus BMI";acc="±5 % und mehr"}
+  }
+  bf=Math.max(3,Math.min(60,bf));
+  const fat=w*bf/100,lean=w-fat;
+  const wc=belly||waist;
+  const whtr=wc?wc/h:null, whr=wc&&hip?wc/hip:null;
+  let visc=null;
+  if(whtr){
+    const lvl=whtr<0.4?0:whtr<0.5?1:whtr<0.6?2:3;
+    const whrHigh=whr&&(sex==="m"?whr>=0.9:whr>=0.85);
+    const L=[["Sehr schlank","var(--fat)"],["Gesund","#6EF0B0"],["Erhöht","var(--carb)"],["Hoch","var(--over)"]];
+    const eff=Math.max(lvl,whrHigh&&lvl<2?2:lvl);
+    visc={whtr,whr,lvl:eff,label:L[eff][0],color:L[eff][1],whrHigh};
+  }
+  return {sex,age,h,w,bmi,bf,src,acc,fat,lean,visc,wc};
+}
+function gauge(val,min,max,stops,color){
+  const pos=Math.max(0,Math.min(100,(val-min)/(max-min)*100));
+  const grad=stops.map(([v,c])=>`${c} ${((v-min)/(max-min)*100).toFixed(1)}%`).join(",");
+  return `<div class="gauge"><div class="gbar" style="background:linear-gradient(90deg,${grad})"></div><i style="left:${pos}%;border-color:${color}"></i></div>`;
+}
+function analysisCardHTML(){
+  const c=bodyComp();
+  if(!c) return `<section class="card"><div class="sec"><h2 class="disp">Körperanalyse</h2></div><p class="hint" style="margin:8px 0 0">Trag unter <b>⚙️ → Bedarfsrechner</b> Geschlecht, Alter und Grösse ein und speichere mit «Als Tagesziel übernehmen». Dann siehst du hier BMI, Körperfett, Viszeralfett und deine Ziel-Prognose.</p><button class="btn ghost" id="openCalc" type="button" style="margin-top:12px;width:100%">Zum Bedarfsrechner</button></section>`;
+  const [bmiL,bmiC]=bmiCat(c.bmi),[bfL,bfC]=bfCat(c.sex,c.bf);
+  const p=state.settings.profile||{};
+  const bfStops=c.sex==="f"?[[10,"#3CCFE6"],[21,"#6EF0B0"],[32,"#FFD60A"],[45,"#FF3B30"]]:[[3,"#3CCFE6"],[14,"#6EF0B0"],[25,"#FFD60A"],[38,"#FF3B30"]];
+  let html=`<section class="card"><div class="sec"><h2 class="disp">Körperanalyse</h2><span class="hint num">${c.w.toFixed(1)} kg · ${c.h} cm</span></div>
+  <div class="agrid">
+    <div class="abox"><span class="ml">BMI</span><b class="num">${c.bmi.toFixed(1)}</b><span class="apill" style="color:${bmiC}">${bmiL}</span>${gauge(c.bmi,15,40,[[15,"#3CCFE6"],[18.5,"#6EF0B0"],[25,"#FFD60A"],[30,"#FF9F0A"],[40,"#FF3B30"]],bmiC)}</div>
+    <div class="abox"><span class="ml">Körperfett</span><b class="num">${c.bf.toFixed(1)}<small> %</small></b><span class="apill" style="color:${bfC}">${bfL}</span>${gauge(c.bf,c.sex==="f"?10:3,c.sex==="f"?45:38,bfStops,bfC)}</div>
+    <div class="abox"><span class="ml">Fettmasse</span><b class="num">${c.fat.toFixed(1)}<small> kg</small></b></div>
+    <div class="abox"><span class="ml">Fettfreie Masse</span><b class="num">${c.lean.toFixed(1)}<small> kg</small></b><span class="md">Muskeln, Knochen, Organe, Wasser</span></div>
+  </div>
+  <p class="hint" style="margin:8px 0 0">Körperfett: ${c.src}${c.acc?` (${c.acc})`:""}. ${c.src.startsWith("grobe")?`Genauer wird es, wenn du unter Körpermasse <b>Nacken</b> und <b>Bauch</b>${c.sex==="f"?" sowie <b>Taille</b> und <b>Glutes</b>":""} misst.`:""} ${c.bmi>=25&&c.bf<(c.sex==="f"?25:18)?"Dein BMI ist erhöht, dein Körperfett aber nicht: Das spricht für viel Muskelmasse. Der BMI unterscheidet nicht zwischen Muskeln und Fett.":""}</p>`;
+  // Viszeralfett
+  html+=`<div class="vbox"><div class="sec"><span class="ml">Viszeralfett-Risiko</span>${c.visc?`<span class="apill" style="color:${c.visc.color}">${c.visc.label}</span>`:""}</div>`;
+  if(c.visc){
+    html+=`${gauge(c.visc.whtr,0.35,0.7,[[0.35,"#3CCFE6"],[0.4,"#6EF0B0"],[0.5,"#FFD60A"],[0.6,"#FF3B30"],[0.7,"#FF3B30"]],c.visc.color)}
+    <p class="hint" style="margin:6px 0 0">Bauch-zu-Grösse-Verhältnis <b class="num">${c.visc.whtr.toFixed(2)}</b> (gesund unter 0.50)${c.visc.whr?` · Bauch-zu-Hüfte <b class="num">${c.visc.whr.toFixed(2)}</b> (Risiko ab ${c.sex==="m"?"0.90":"0.85"})`:""}. Viszeralfett liegt um die Organe. Es lässt sich ohne Scan nicht direkt messen, aber der Bauchumfang zeigt es gut an.</p>`;
+  } else html+=`<p class="hint" style="margin:6px 0 0">Miss unter Körpermasse deinen <b>Bauch</b> (Höhe Bauchnabel), dann siehst du hier dein Risiko.</p>`;
+  html+=`<details class="why" ${c.visc&&c.visc.lvl>=2?"open":""}><summary>So wirst du Bauch- und Viszeralfett los</summary>
+    <p><b>1. Leichtes Kaloriendefizit.</b> Viszeralfett ist das erste Fett, das beim Abnehmen schwindet. Schon 5–10 % weniger Gewicht senken es deutlich.</p>
+    <p><b>2. Ausdauer.</b> 150–300 Minuten pro Woche moderat (zügig gehen, Velo, Schwimmen) oder 75–150 Minuten intensiv. Ausdauer baut Viszeralfett besonders gut ab.</p>
+    <p><b>3. Krafttraining 2–4× pro Woche.</b> Es erhält deine Muskeln im Defizit und verbessert den Stoffwechsel.</p>
+    <p><b>4. Schlaf 7–9 Stunden.</b> Wenig Schlaf erhöht Hunger und Stresshormone, die Bauchfett fördern.</p>
+    <p><b>5. Alkohol reduzieren.</b> Er landet besonders gern am Bauch.</p>
+    <p><b>6. Zuckergetränke weglassen, mehr Ballaststoffe.</b> Ziel mindestens 30 g Ballaststoffe am Tag (Gemüse, Hülsenfrüchte, Vollkorn, Haferflocken), dazu genug Eiweiss.</p>
+    <p><b>7. Stress senken.</b> Dauerstress und Cortisol begünstigen Bauchfett. Spaziergänge, Pausen und Atemübungen helfen.</p>
+    <p><b>Mythos:</b> Crunches verbrennen kein Bauchfett. Punktuelles Abnehmen gibt es nicht, nur Abnehmen insgesamt.</p>
+  </details></div>`;
+  // Ziel-Prognose
+  const t=+p.target;
+  if(t&&Math.abs(t-c.w)>=0.5){
+    const dir=t<c.w?"lose":"gain",dw=t-c.w;
+    const leanShare=dir==="lose"?0.25:0.5;
+    const nLean=c.lean+dw*leanShare,nFat=Math.max(1,c.fat+dw*(1-leanShare)),nBf=nFat/t*100,nBmi=t/((c.h/100)**2);
+    const nWc=c.wc?c.wc+(dir==="lose"?dw*1:dw*0.3):null;
+    const rate=p.rate&&p.goal===dir?+p.rate:null;
+    let when="Wähle im Bedarfsrechner ein Tempo, dann siehst du das Datum.";
+    if(rate){const wk=Math.ceil(Math.abs(dw)/rate);const d=new Date();d.setDate(d.getDate()+wk*7);when=`Bei ${rate} kg pro Woche in ca. <b>${wk} Wochen</b>, also um den <b>${d.toLocaleDateString("de-CH",{day:"numeric",month:"long",year:"numeric"})}</b>.`}
+    const [nbL,nbC]=bmiCat(nBmi),[nfL,nfC]=bfCat(c.sex,nBf);
+    const row=(l,a,b,col)=>`<div class="prow"><span>${l}</span><span class="num">${a}</span><span class="parr">→</span><span class="num" style="${col?`color:${col}`:""}">${b}</span></div>`;
+    html+=`<div class="vbox"><div class="sec"><span class="ml">Ziel-Prognose</span><span class="apill" style="color:var(--kcal)">${t} kg</span></div>
+      <div class="ptab">
+        <div class="prow phead"><span></span><span>Jetzt</span><span></span><span>Ziel</span></div>
+        ${row("Gewicht",c.w.toFixed(1)+" kg",t.toFixed(1)+" kg")}
+        ${row("BMI",c.bmi.toFixed(1),nBmi.toFixed(1),nbC)}
+        ${row("Körperfett",c.bf.toFixed(1)+" %",nBf.toFixed(1)+" %",nfC)}
+        ${row("Fettmasse",c.fat.toFixed(1)+" kg",nFat.toFixed(1)+" kg")}
+        ${row("Fettfreie Masse",c.lean.toFixed(1)+" kg",nLean.toFixed(1)+" kg")}
+        ${nWc?row("Bauch ca.",c.wc.toFixed(0)+" cm",nWc.toFixed(0)+" cm"):""}
+      </div>
+      <p class="hint" style="margin:8px 0 0">${when}</p>
+      <p class="hint" style="margin:4px 0 0">Annahme: ${dir==="lose"?"Mit genug Eiweiss und Krafttraining sind etwa 75 % der verlorenen Kilos Fett.":"Bei langsamem Aufbau mit Training sind etwa die Hälfte der Kilos Muskeln."} Der Bauchumfang ist eine grobe Schätzung${dir==="lose"?" (etwa 1 cm pro kg)":""}.</p>
+    </div>`;
+  } else html+=`<p class="hint" style="margin:12px 0 0">Trag im <b>Bedarfsrechner</b> ein Zielgewicht ein, dann siehst du hier, wie dein Körper am Ziel aussehen könnte und wann du es erreichst.</p>`;
+  return html+`</section>`;
+}
 function render(){
   const g=state.settings.goals;
   const t=dayTotals(selDate);
@@ -674,6 +802,7 @@ function render(){
   html+=`<section class="card water"><div class="sec"><h2 class="disp">Wasser</h2><small class="num">${(day.water*0.25).toFixed(2).replace(/0$/,"")} / ${(wg*0.25).toFixed(2).replace(/0$/,"")} l</small></div><div class="glasses">${gl}</div></section>`;
   html+=weightCardHTML();
   html+=measCardHTML();
+  html+=analysisCardHTML();
 
   // Woche
   const days=[];for(let i=6;i>=0;i--)days.push(shift(selDate,-i));
@@ -707,6 +836,7 @@ document.getElementById("app").addEventListener("click",e=>{
   if(t.dataset.savefav){openSaveFav(t.dataset.savefav);return}
   if(t.id==="wAdd"){openWeight();return}
   if(t.id==="mAdd"){openMeasure();return}
+  if(t.id==="openCalc"){openSettings();setTimeout(()=>{const e=document.getElementById("pSex");if(e)e.scrollIntoView({block:"center"})},250);return}
   if(t.dataset.r){wRange=+t.dataset.r;render();return}
   if(t.dataset.glass!==undefined){const d=getDay(selDate);const i=+t.dataset.glass;d.water=(d.water===i+1)?i:i+1;persist("d-"+selDate);render();return}
   if(t.dataset.day){selDate=t.dataset.day;render();return}
@@ -956,15 +1086,17 @@ function settingsHTML(){
   <div class="grid2" style="grid-template-columns:1fr 1fr 1fr"><div class="field"><label for="gP">Eiweiss g</label><input class="inp num" id="gP" type="number" inputmode="numeric" value="${r0(g.p)}"></div><div class="field"><label for="gC">Kohlenh. g</label><input class="inp num" id="gC" type="number" inputmode="numeric" value="${r0(g.c)}"></div><div class="field"><label for="gF">Fett g</label><input class="inp num" id="gF" type="number" inputmode="numeric" value="${r0(g.f)}"></div></div>
   <p class="hint num" id="gSum" style="margin:0"></p>
   <button class="btn" id="gSave" type="button">Ziele speichern</button>
-  <div class="sec-l" style="margin-top:10px">Ziele berechnen</div>
-  <p class="hint" style="margin:0">Schätzung nach der Mifflin-St-Jeor-Formel. Ein guter Startpunkt, den du nach 2–3 Wochen an dein Gewicht anpassen kannst.</p>
+  <div class="sec-l" style="margin-top:10px">Bedarfsrechner</div>
+  <p class="hint" style="margin:0">Berechnet deinen Verbrauch und die idealen Makros für dein Ziel. Grundlage sind aktuelle Empfehlungen aus der Sporternährung.</p>
   <div class="grid2"><div class="field"><label for="pSex">Geschlecht</label><select class="inp" id="pSex"><option value="m" ${pr.sex==="m"?"selected":""}>Mann</option><option value="f" ${pr.sex==="f"?"selected":""}>Frau</option></select></div><div class="field"><label for="pAge">Alter</label><input class="inp num" id="pAge" type="number" inputmode="numeric" value="${pr.age}"></div></div>
-  <div class="grid2"><div class="field"><label for="pW">Gewicht (kg)</label><input class="inp num" id="pW" type="number" inputmode="decimal" value="${pr.w}"></div><div class="field"><label for="pH">Grösse (cm)</label><input class="inp num" id="pH" type="number" inputmode="numeric" value="${pr.h}"></div></div>
-  <div class="field"><label for="pAct">Aktivität</label><select class="inp" id="pAct">
-    ${[[1.2,"Kaum Bewegung (Bürojob)"],[1.375,"Leicht aktiv (1–3× Sport/Woche)"],[1.55,"Aktiv (3–5× Sport/Woche)"],[1.725,"Sehr aktiv (6–7× Sport/Woche)"]].map(([v,l])=>`<option value="${v}" ${+pr.act===v?"selected":""}>${l}</option>`).join("")}</select></div>
-  <div class="field"><label for="pGoal">Ziel</label><select class="inp" id="pGoal">
-    ${[["lose","Abnehmen (ca. −0.4 kg/Woche)"],["keep","Gewicht halten"],["gain","Muskelaufbau (leichter Überschuss)"]].map(([v,l])=>`<option value="${v}" ${pr.goal===v?"selected":""}>${l}</option>`).join("")}</select></div>
-  <button class="btn ghost" id="pCalc" type="button">Berechnen und oben eintragen</button>
+  <div class="grid2"><div class="field"><label for="pW">Gewicht (kg)</label><input class="inp num" id="pW" type="number" inputmode="decimal" step="0.1" value="${pr.w}"></div><div class="field"><label for="pH">Grösse (cm)</label><input class="inp num" id="pH" type="number" inputmode="numeric" value="${pr.h}"></div></div>
+  <div class="grid2"><div class="field"><label for="pBf">Körperfett % (optional)</label><input class="inp num" id="pBf" type="number" inputmode="decimal" step="0.5" placeholder="z.B. 18" value="${pr.bf||""}"></div><div class="field"><label for="pTarget">Zielgewicht (optional)</label><input class="inp num" id="pTarget" type="number" inputmode="decimal" step="0.5" placeholder="kg" value="${pr.target||""}"></div></div>
+  <div class="field"><label for="pDate">Wunschdatum fürs Zielgewicht (optional)</label><input class="inp" id="pDate" type="date" min="${shift(todayKey(),7)}" value="${pr.date||""}"></div>
+  <div class="field"><label for="pAct">Alltag und Training</label><select class="inp" id="pAct">
+    ${ACT_LEVELS.map(([v,l])=>`<option value="${v}" ${+pr.act===v?"selected":""}>${l}</option>`).join("")}</select></div>
+  <div class="field"><label>Ziel</label><div class="seg" id="pGoalSeg">${[["lose","Fett verlieren"],["keep","Halten"],["gain","Muskeln aufbauen"]].map(([v,l])=>`<button type="button" data-goal="${v}" class="${(pr.goal||"keep")===v?"on":""}">${l}</button>`).join("")}</div></div>
+  <div class="field" id="pRateBox"><label>Tempo pro Woche</label><div class="chips" id="pRates"></div><span class="mhow" id="pRateNote"></span></div>
+  <div id="calcOut"></div>
   <div class="sec-l" style="margin-top:10px">KI mit Google Gemini</div>
   <p class="hint" style="margin:0">${getGemKey()?'<b style="color:var(--kcal)">KI ist aktiv.</b> ':''}Für die KI-Schätzung und das Auslesen von Fotos. Hol dir einen kostenlosen Schlüssel auf <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" style="color:var(--kcal)">aistudio.google.com/apikey</a> und füge ihn hier ein. Er bleibt nur auf diesem iPhone gespeichert.</p>
   <input class="inp" id="gemKey" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="${getGemKey()?"Schlüssel gespeichert (zum Ändern neu einfügen)":"API-Schlüssel einfügen"}">
@@ -1164,20 +1296,153 @@ function bindSettings(){
     if(mode==="cloud"){for(const k of keys){try{await col.doc(k).delete()}catch(e){}}}
     importState.msg="Importierte Produkte gelöscht.";importState.err=false;renderSheet();
   };
-  $("pCalc").onclick=()=>{
-    const sex=$("pSex").value,age=+$("pAge").value,w=+$("pW").value,h=+$("pH").value,act=+$("pAct").value,goal=$("pGoal").value;
-    if(!(age>0&&w>0&&h>0))return;
-    const bmr=10*w+6.25*h-5*age+(sex==="m"?5:-161);
-    let kcal=bmr*act+(goal==="lose"?-400:goal==="gain"?300:0);
-    kcal=Math.max(kcal,sex==="m"?1500:1200);
-    kcal=Math.round(kcal/10)*10;
-    const p=Math.round(w*(goal==="keep"?1.6:1.9));
-    const f=Math.round(kcal*0.27/9);
-    const c=Math.max(0,Math.round((kcal-p*4-f*9)/4));
-    $("gK").value=kcal;$("gP").value=p;$("gC").value=c;$("gF").value=f;sum();
-    state.settings.profile={sex,age,w,h,act,goal};
-    $("gSave").scrollIntoView({behavior:"smooth",block:"center"});
+  const calcState={goal:(state.settings.profile&&state.settings.profile.goal)||"keep",rate:(state.settings.profile&&state.settings.profile.rate)||null,useMeasured:false};
+  const rerun=()=>{const r=computePlan(readCalc());renderCalc(r)};
+  const readCalc=()=>({sex:$("pSex").value,age:+$("pAge").value,w:+String($("pW").value).replace(",","."),h:+$("pH").value,bf:parseFloat(String($("pBf").value).replace(",","."))||null,target:parseFloat(String($("pTarget").value).replace(",","."))||null,date:$("pDate").value||null,act:+$("pAct").value,goal:calcState.goal,rate:calcState.rate,useMeasured:calcState.useMeasured});
+  const renderRates=()=>{
+    const w=+String($("pW").value).replace(",",".")||0, opts=RATE_OPTS[calcState.goal]||[];
+    $("pRateBox").hidden=calcState.goal==="keep";
+    if(calcState.goal!=="keep"&&(calcState.rate===null||!opts.includes(calcState.rate)))calcState.rate=calcState.goal==="lose"?(w>0?closest(opts,w*0.006):0.5):(w>0?closest(opts,w*0.0035):0.25);
+    $("pRates").innerHTML=opts.map(v=>{const pct=w>0?v/w*100:0;const tag=rateTag(calcState.goal,pct);return `<button type="button" class="chip ${calcState.rate===v?"on":""}" data-rate="${v}">${calcState.goal==="lose"?"−":"+"}${v.toString().replace(".",".")} kg <small style="opacity:.75">· ${pct.toFixed(1)} %</small></button>`}).join("");
+    const pct=w>0&&calcState.rate?calcState.rate/w*100:0;
+    $("pRateNote").innerHTML=calcState.goal==="keep"?"":rateNote(calcState.goal,pct);
   };
+  const renderCalc=r=>{
+    const out=$("calcOut");
+    if(!r){out.innerHTML=`<p class="hint" style="margin:0">Fülle Alter, Gewicht und Grösse aus.</p>`;return}
+    const m=r.measured;
+    out.innerHTML=`<div class="calcres">
+      <div class="crow"><span>Grundumsatz <small>${r.bf?"Katch-McArdle":"Mifflin-St Jeor"}</small></span><b class="num">${r.bmr} kcal</b></div>
+      <div class="crow"><span>Gesamtverbrauch <small>${r.usedMeasured?"aus deinen Daten":"geschätzt"}</small></span><b class="num">${r.tdee} kcal</b></div>
+      ${m?`<label class="check" style="font-size:13px;margin:4px 0;align-items:flex-start"><input type="checkbox" id="pMeasured" ${calcState.useMeasured?"checked":""} style="flex-shrink:0;margin-top:1px"><span>Gemessenen Verbrauch verwenden: <b class="num">${m.tdee} kcal</b><br><span class="hint">Berechnet aus ${m.days} Tagen Essen und Gewicht. Genauer als jede Formel.</span></span></label>`:""}
+      <div class="crow big"><span>Dein Tagesziel</span><b class="num">${r.kcal} kcal</b></div>
+      <div class="hint num" style="margin-top:-4px">${r.delta===0?"Genau dein Verbrauch.":(r.delta<0?`${Math.abs(r.delta)} kcal Defizit pro Tag`:`${r.delta} kcal Überschuss pro Tag`)}${r.eta?` · Zielgewicht in ca. ${r.eta.weeks} Wochen (${r.eta.date})`:""}</div>
+      <div class="preview" style="margin-top:10px">
+        <div><b class="num" style="color:var(--pro)">${r.p}</b><span>Eiweiss g</span></div>
+        <div><b class="num" style="color:var(--carb)">${r.c}</b><span>Kohlenh. g</span></div>
+        <div><b class="num" style="color:var(--fat)">${r.f}</b><span>Fett g</span></div>
+        <div><b class="num">${r.pPerKg}</b><span>g Eiw./kg</span></div>
+      </div>
+      ${r.plan?`<div class="plan plan-${r.plan.level}"><b>${r.plan.title}</b><span>${r.plan.text}</span>${r.plan.rate&&(RATE_OPTS[calcState.goal]||[]).length?`<button type="button" class="chip" id="pUsePlan" style="margin-top:6px;align-self:flex-start">Tempo ${r.plan.chip} kg/Woche wählen</button>`:""}</div>`:""}
+      ${r.warn.map(x=>`<p class="err" style="margin:6px 0 0">${x}</p>`).join("")}
+      <details class="why"><summary>Warum diese Werte?</summary>${r.why.map(x=>`<p>${x}</p>`).join("")}</details>
+      <button class="btn" id="pApply" type="button" style="width:100%;margin-top:10px">Als Tagesziel übernehmen</button>
+    </div>`;
+    const mc=$("pMeasured");if(mc)mc.onchange=()=>{calcState.useMeasured=mc.checked;rerun()};
+    const up=$("pUsePlan");if(up)up.onclick=()=>{calcState.rate=r.plan.chip;renderRates();rerun()};
+    $("pApply").onclick=()=>{
+      const x=readCalc();
+      state.settings.goals={kcal:r.kcal,p:r.p,c:r.c,f:r.f};
+      state.settings.profile={sex:x.sex,age:x.age,w:x.w,h:x.h,bf:x.bf,target:x.target,date:x.date,act:x.act,goal:x.goal,rate:x.rate};
+      persist("settings");render();
+      $("gK").value=r.kcal;$("gP").value=r.p;$("gC").value=r.c;$("gF").value=r.f;sum();
+      toast("Neue Ziele übernommen");
+    };
+  };
+  ["pSex","pAge","pW","pH","pBf","pTarget","pDate","pAct"].forEach(id=>{$(id).oninput=()=>{if(id==="pW")renderRates();rerun()};$(id).onchange=$(id).oninput});
+  $("pGoalSeg").onclick=e=>{const b=e.target.closest("[data-goal]");if(!b)return;calcState.goal=b.dataset.goal;calcState.rate=null;$("pGoalSeg").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b));renderRates();rerun()};
+  $("pRates").onclick=e=>{const b=e.target.closest("[data-rate]");if(!b)return;calcState.rate=+b.dataset.rate;renderRates();rerun()};
+  renderRates();rerun();
+}
+
+/* ---------- Bedarfsrechner ---------- */
+const ACT_LEVELS=[[1.2,"Sitzend: Bürojob, kaum Bewegung"],[1.375,"Leicht aktiv: 1–3× Training pro Woche"],[1.55,"Aktiv: 3–5× Training pro Woche"],[1.725,"Sehr aktiv: 6–7× Training oder Job auf den Beinen"],[1.9,"Extrem: Leistungssport oder harte körperliche Arbeit"]];
+const RATE_OPTS={lose:[0.25,0.5,0.75,1],gain:[0.1,0.2,0.3,0.5]};
+const KCAL_PER_KG=7700;
+function closest(arr,v){return arr.reduce((a,b)=>Math.abs(b-v)<Math.abs(a-v)?b:a)}
+function rateTag(goal,pct){if(goal==="lose")return pct<=0.5?"sanft":pct<=1?"empfohlen":"aggressiv";return pct<=0.25?"lean":pct<=0.5?"empfohlen":"schnell"}
+function rateNote(goal,pct){
+  if(goal==="lose"){
+    if(pct<=0.5)return `<b style="color:var(--fat)">Muskelschonend.</b> Unter 0.5 % pro Woche behältst du am meisten Muskeln, ideal wenn du schon schlank bist.`;
+    if(pct<=1)return `<b style="color:#6EF0B0">Empfohlen.</b> 0.5–1 % deines Gewichts pro Woche: guter Fortschritt bei Erhalt der Muskeln.`;
+    return `<b style="color:var(--over)">Aggressiv.</b> Über 1 % pro Woche steigt das Risiko für Muskelverlust, Hunger und Leistungseinbruch. Nur kurzfristig oder bei deutlichem Übergewicht.`;
+  }
+  if(pct<=0.25)return `<b style="color:var(--fat)">Lean Bulk.</b> Wenig Fettzunahme. Passt für Fortgeschrittene mit mehreren Jahren Training.`;
+  if(pct<=0.5)return `<b style="color:#6EF0B0">Empfohlen.</b> 0.25–0.5 % pro Woche: genug Überschuss für Muskelaufbau, wenig Fett. Ideal für Einsteiger und Fortgeschrittene.`;
+  return `<b style="color:var(--over)">Schnell.</b> Über 0.5 % pro Woche ist meist mehr Fett als Muskel.`;
+}
+function measuredTDEE(){
+  const tk=todayKey(),from=shift(tk,-35);
+  const ws=Object.entries(state.weights).filter(([d,v])=>v>0&&d>=from&&d<=tk).sort((a,b)=>a[0]<b[0]?-1:1);
+  if(ws.length<3)return null;
+  const [d0]=ws[0],[d1]=ws[ws.length-1];
+  const span=Math.round((parseKey(d1)-parseKey(d0))/864e5);
+  if(span<14)return null;
+  // gleitender Schnitt der ersten und letzten Messungen gegen Tagesschwankungen
+  const avg=a=>a.reduce((x,y)=>x+y[1],0)/a.length;
+  const w0=avg(ws.slice(0,Math.min(3,ws.length>>1))),w1=avg(ws.slice(-Math.min(3,ws.length>>1)));
+  let sum=0,n=0;
+  for(let k=d0;k<d1;k=shift(k,1)){const t=dayTotals(k);if(t.n>=2&&t.k>600){sum+=t.k;n++}}
+  if(n<span*0.7)return null;
+  const tdee=Math.round((sum/n-(w1-w0)*KCAL_PER_KG/span)/10)*10;
+  if(!(tdee>1000&&tdee<6000))return null;
+  return {tdee,days:span};
+}
+function computePlan(x){
+  if(!(x.age>=14&&x.age<=100&&x.w>=30&&x.w<=300&&x.h>=120&&x.h<=230))return null;
+  const hm=x.h/100,bmi=x.w/(hm*hm);
+  const bf=x.bf&&x.bf>=3&&x.bf<=60?x.bf:null;
+  const lbm=bf?x.w*(1-bf/100):null;
+  const bmr=Math.round(bf?370+21.6*lbm:10*x.w+6.25*x.h-5*x.age+(x.sex==="m"?5:-161));
+  const est=Math.round(bmr*x.act/10)*10;
+  const measured=measuredTDEE();
+  const usedMeasured=!!(x.useMeasured&&measured);
+  const tdee=usedMeasured?measured.tdee:est;
+  const rate=x.goal==="keep"?0:(x.rate||0);
+  let delta=Math.round((x.goal==="lose"?-1:x.goal==="gain"?1:0)*rate*KCAL_PER_KG/7/10)*10;
+  const floor=x.sex==="m"?1500:1200;
+  const warn=[];
+  let kcal=tdee+delta;
+  if(kcal<floor){kcal=floor;delta=kcal-tdee;warn.push(`Das Ziel wäre unter ${floor} kcal. Ich habe auf ${floor} kcal begrenzt. Wähle besser ein langsameres Tempo.`)}
+  else if(x.goal==="lose"&&kcal<bmr)warn.push("Du isst damit weniger als deinen Grundumsatz. Das geht, ist aber anstrengend. Mit einem langsameren Tempo hältst du meist länger durch.");
+  const pct=rate&&x.w?rate/x.w*100:0;
+  if(x.goal==="lose"&&pct>1)warn.push("Über 1 % pro Woche: rechne mit mehr Hunger und Muskelverlust. Höchstens ein paar Wochen so.");
+  // Eiweiss: auf Normalgewicht bezogen, falls BMI hoch, bzw. auf fettfreie Masse
+  const refW=bmi>27?Math.round(25*hm*hm):x.w;
+  let p;
+  if(lbm) p=(x.goal==="lose"?2.5:2.1)*lbm;
+  else p=(x.goal==="lose"?2.0:1.8)*refW;
+  p=Math.round(p/5)*5;
+  let f=Math.round((x.goal==="lose"?0.7:0.9)*refW);
+  const fMin=Math.round(kcal*0.2/9),fMax=Math.round(kcal*0.35/9);
+  f=Math.min(Math.max(f,fMin),fMax);
+  let c=Math.round((kcal-p*4-f*9)/4);
+  if(c<50){f=fMin;c=Math.max(0,Math.round((kcal-p*4-f*9)/4))}
+  kcal=Math.round(kcal/10)*10;
+  let eta=null;
+  if(x.target&&rate>0&&((x.goal==="lose"&&x.target<x.w)||(x.goal==="gain"&&x.target>x.w))){
+    const weeks=Math.ceil(Math.abs(x.w-x.target)/rate);
+    const d=new Date();d.setDate(d.getDate()+weeks*7);
+    eta={weeks,date:d.toLocaleDateString("de-CH",{day:"numeric",month:"long",year:"numeric"})};
+  }
+  let plan=null;
+  if(x.target&&x.date&&Math.abs(x.target-x.w)>=0.5){
+    const days=Math.round((parseKey(x.date)-parseKey(todayKey()))/864e5);
+    const dir=x.target<x.w?"lose":"gain";
+    if(days>=7){
+      const weeks=days/7,need=Math.abs(x.w-x.target)/weeks,npct=need/x.w*100;
+      const fmtD=d=>d.toLocaleDateString("de-CH",{day:"numeric",month:"long",year:"numeric"});
+      const idealPct=dir==="lose"?0.75:0.35, maxPct=dir==="lose"?1:0.5;
+      const idealWeeks=Math.ceil(Math.abs(x.w-x.target)/(x.w*idealPct/100));
+      const idealDate=new Date();idealDate.setDate(idealDate.getDate()+idealWeeks*7);
+      const opts=RATE_OPTS[dir];
+      const chip=opts.filter(v=>v>=need-0.001)[0]||opts[opts.length-1];
+      const verb=dir==="lose"?"abnehmen":"zunehmen";
+      if(dir!==x.goal&&x.goal!=="keep"){plan={level:"warn",title:"Ziel und Richtung passen nicht",text:`Dein Zielgewicht bedeutet ${verb}, du hast aber «${x.goal==="lose"?"Fett verlieren":"Muskeln aufbauen"}» gewählt.`};}
+      else if(npct<=(dir==="lose"?0.5:0.25)) plan={level:"ok",title:"Entspannt machbar ✓",text:`Du müsstest ${need.toFixed(2)} kg pro Woche ${verb} (${npct.toFixed(1)} %). Das ist sehr gut machbar, du könntest sogar etwas schneller werden.`,rate:true,chip};
+      else if(npct<=maxPct) plan={level:"ok",title:"Realistisch ✓",text:`Dafür brauchst du ${need.toFixed(2)} kg pro Woche (${npct.toFixed(1)} %). Das liegt im empfohlenen Bereich.`,rate:true,chip};
+      else if(npct<=maxPct*1.5) plan={level:"warn",title:"Sportlich",text:`Du müsstest ${need.toFixed(2)} kg pro Woche ${verb} (${npct.toFixed(1)} %). Das ist mehr als empfohlen. Realistisch ist ${fmtD(idealDate)}.`,rate:true,chip};
+      else plan={level:"bad",title:"Nicht empfehlenswert",text:`Dafür bräuchtest du ${need.toFixed(2)} kg pro Woche (${npct.toFixed(1)} %). Gesund erreichbar ist dein Ziel etwa bis ${fmtD(idealDate)}.`};
+    }
+  }
+  const why=[
+    `<b>Grundumsatz:</b> ${bf?"Mit Körperfett nutzt der Rechner die Katch-McArdle-Formel, die auf deiner fettfreien Masse beruht.":"Die Mifflin-St-Jeor-Formel gilt in Studien als die genaueste Schätzung für die meisten Erwachsenen. Mit Körperfett-Angabe wird es für Trainierte noch genauer."}`,
+    `<b>Tempo:</b> 1 kg Körperfett entspricht etwa 7700 kcal. ${x.goal==="lose"?"Beim Abnehmen gelten 0.5–1 % des Körpergewichts pro Woche als guter Kompromiss. Wer schon schlank ist, geht besser langsamer, um Muskeln zu halten.":x.goal==="gain"?"Beim Muskelaufbau empfehlen Studien 0.25–0.5 % des Körpergewichts pro Woche und einen Überschuss von etwa 10–20 %. Mehr bringt vor allem Fett.":"Zum Halten isst du etwa so viel, wie du verbrauchst."}`,
+    `<b>Eiweiss:</b> ${x.goal==="lose"?"Im Defizit schützt viel Eiweiss die Muskeln. Empfohlen sind etwa 1.8–2.7 g pro kg Körpergewicht bzw. 2.3–3.1 g pro kg fettfreier Masse.":"Für Muskelaufbau reichen etwa 1.6–2.2 g pro kg Körpergewicht. Mehr bringt kaum zusätzlichen Nutzen."}${bmi>27&&!lbm?" Bei höherem Gewicht bezieht der Rechner das Eiweiss auf dein Normalgewicht, sonst wird es unnötig viel.":""}`,
+    `<b>Fett:</b> mindestens 20 % der Kalorien, wichtig für Hormone und Vitaminaufnahme. <b>Kohlenhydrate:</b> der Rest. Sie liefern die Energie fürs Training.`,
+    `<b>Wichtig:</b> Jeder Rechner schätzt nur. Wiege dich 3–7× pro Woche und schau nach 2–3 Wochen auf den Trend. Sobald genug Daten da sind, zeigt Plumergy hier deinen <b>gemessenen Verbrauch</b> aus deinem Essen und Gewicht an.`
+  ];
+  return {bmr,tdee,kcal,delta,p,c,f,pPerKg:(p/x.w).toFixed(1),eta,warn,why,bf,measured,usedMeasured,plan};
 }
 
 async function runAI(){
