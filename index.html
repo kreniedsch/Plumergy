@@ -559,6 +559,10 @@ details.how p{margin:4px 0 0;font-size:12.8px;line-height:1.45;color:var(--muted
 .festcard{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:start;background:linear-gradient(135deg,rgba(255,159,10,.18),rgba(214,115,196,.16));border:1px solid rgba(255,159,10,.35);border-radius:22px;padding:14px 16px}
 .festcard .ic{font-size:30px;line-height:1.1}.festcard b{display:block;font-size:16px}.festcard small{display:block;color:var(--muted);font-size:12.8px;line-height:1.45;margin-top:3px}
 .festcard .x{border:0;background:transparent;color:var(--muted);font-size:15px;padding:2px 4px}
+#ambient{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+#ambient span{position:absolute;opacity:.28;filter:saturate(.9)}
+@media (prefers-reduced-motion:no-preference){#ambient span{animation:ambf ease-in-out infinite alternate}}
+@keyframes ambf{0%{transform:translate(0,0) rotate(-8deg)}50%{transform:translate(14px,-26px) rotate(6deg)}100%{transform:translate(-10px,-48px) rotate(-4deg)}}
 .fabbar{display:none}
 #mealSeg{overflow-x:auto;scrollbar-width:none;justify-content:flex-start}#mealSeg::-webkit-scrollbar{display:none}#mealSeg button{flex:0 0 auto;font-size:13px;padding:8px 11px}
 .card.meal{padding:0}
@@ -2996,6 +3000,7 @@ function profileHTML(G){
     <button class="rowb" type="button" data-act="settings"><i class="ri" style="background:rgba(214,115,196,.18)">🎯</i><span>Ziele & Rechner${typeof getGemKey==="function"?", KI, Backup":""}</span><em>›</em></button>
     <button class="rowb" type="button" data-act="activity"><i class="ri" style="background:rgba(110,240,176,.15)">❤️</i><span>Aktivität & Apple Health</span><em>›</em></button>
     <button class="rowb" type="button" data-act="weight"><i class="ri" style="background:rgba(10,132,255,.18)">⚖️</i><span>Gewicht erfassen</span><em>›</em></button>
+    <button class="rowb" type="button" data-act="themetgl"><i class="ri" style="background:rgba(255,159,10,.16)">🎨</i><span>Saison-Design: <b>${state.settings.themeOff?"Aus":"An"}</b>${(()=>{const s=seasonNow();return s&&!state.settings.themeOff?" "+s.deco:""})()}</span><em>↻</em></button>
     <button class="rowb" type="button" data-act="diets"><i class="ri" style="background:rgba(214,115,196,.18)">🥗</i><span>Diät & Fasten: <b>${DSTYLES[state.settings.dstyle||"none"].n}${fastCfg().on?" · "+(FAST_TYPES.find(x=>x[0]===fastCfg().len)||[,""])[1]:""}${state.settings.cycle?" · Zyklus":""}</b></span><em>›</em></button>
     <button class="rowb" type="button" data-act="gym"><i class="ri" style="background:rgba(110,240,176,.15)">🏋️</i><span>Krafttraining</span><em>›</em></button>
     <button class="rowb" type="button" data-act="plan"><i class="ri" style="background:rgba(255,159,10,.16)">🛒</i><span>Wochenplan & Einkaufsliste</span><em>›</em></button>
@@ -3822,9 +3827,10 @@ const EX_HOW={
 const WARMUP="5 Minuten locker bewegen (Velo, Laufband, Treppe oder Hampelmann). Dann Armkreisen, Hüftkreisen und 10 Kniebeugen ohne Gewicht. Bei der ersten Übung 1–2 leichte Sätze mit etwa der Hälfte des Gewichts.";
 
 /* ---- Neu in Plumergy ---- */
-const APP_VER="2026-10-09";
+const APP_VER="2026-10-09b";
 /* NEWS: [Version, Emoji, Titel, Text] – neuste zuerst. Gezeigt wird alles, was neuer ist als die zuletzt gesehene Version. */
 const NEWS=[
+ ["2026-10-09b","🦇","Saison-Design","Die ganze App zieht sich passend zur Saison an: Farben, Hintergrund, schwebende Deko. Im Oktober 🎃 mit Fledermäusen, Geistern und Spinnennetz. Abschalten unter Profil → Saison-Design."],
  ["2026-10-09","🎃","Feiertags-Logo","Das Plumergy-Logo und der Startbildschirm passen sich jeden Monat und an Feiertagen an: Halloween, Samichlaus, Weihnachten, Fasnacht, Sechseläuten, 1. August und mehr."],
  ["2026-10-09","🍂","Saison-Rezepte","8 neue Rezepte passend zur Jahreszeit, z.B. Kürbis-Linsen-Suppe, Protein-Grittibänz und Raclette light, dazu das Schweizer Saison-Gemüse des Monats unter Kochen."],
 
@@ -3894,8 +3900,52 @@ function seasonRecHTML(){const m=new Date().getMonth()+1,ms=MONTH_SEASON[m],list
   ${list.length?`<div class="hscroll">${list.map(r=>{const v=r[goal]||r.cut;return `<button type="button" class="rmini" data-recgo="${r.id}"><span class="rtag" style="align-self:flex-start">${esc(r.tag)}</span><b>${esc(r.n)}</b><span class="rm">${esc(r.time)}</span><div class="kp num"><span>${r0(v.k)} kcal</span><span style="color:var(--pro)">${r0(v.p)} g Eiweiss</span></div></button>`}).join("")}</div>`:""}
   <p class="hint" style="margin:6px 0 0"><b style="color:var(--ink)">Schweizer Saison jetzt:</b> ${esc(SEASON_VEG[m])}. Saisonal ist frischer, günstiger und schmeckt besser.</p>`}
 (function(){try{const sp=document.getElementById("splash");const s=seasonNow();if(sp&&s){const svg=sp.querySelector("svg");if(svg){const w=document.createElement("div");w.className="spdeco";w.textContent=s.deco;svg.insertAdjacentElement("afterend",w)}if(s.greet){const tg=sp.querySelector(".tg");if(tg)tg.textContent=s.greet}seasonFx(sp)}}catch(e){}})();
+/* ---- Saison-Design (Farben, Hintergrund, Deko) ---- */
+const THEME_OF={halloween:"halloween",m10:"halloween",advent:"xmas",samichlaus:"xmas",weihnachten:"xmas",m12:"xmas",silvester:"newyear",silvester2:"newyear",neujahr:"newyear",neujahr2:"newyear",m1:"winter",m2:"winter",fasnacht:"party",streetparade:"party",valentin:"love",valentin2:"love",ostern:"easter",sechselaeuten:"spring",m3:"spring",m4:"spring",m5:"spring",m6:"summer",m7:"summer",m8:"summer",augustfeier:"swiss",augustfeier2:"swiss",m9:"autumn",m11:"lantern"};
+const THEMES={
+ halloween:{a:"#E8590C",k:"#FF8A2B",soft:"rgba(255,122,26,.18)",grad:"linear-gradient(135deg,#FFA040 0%,#E8590C 50%,#5E2B91 100%)",g1:"rgba(255,110,20,.22)",g2:"rgba(110,40,170,.28)",bd:"rgba(255,122,26,.22)",amb:["🦇","👻","🦇","🕸️","🍬","🦇","👻","🎃"],mark:"🎃",web:1},
+ xmas:{a:"#C8102E",k:"#FF4D5E",soft:"rgba(200,16,46,.18)",grad:"linear-gradient(135deg,#FF5A5A 0%,#C8102E 50%,#1E7A46 100%)",g1:"rgba(200,16,46,.20)",g2:"rgba(30,122,70,.24)",bd:"rgba(255,215,0,.18)",amb:["❄️","✨","❄️","⭐","❄️","🎁","❄️","✨"],mark:"🎄",lights:1},
+ newyear:{a:"#C9A227",k:"#FFD54A",soft:"rgba(255,213,74,.16)",grad:"linear-gradient(135deg,#FFE27A 0%,#C9A227 50%,#3A2A6B 100%)",g1:"rgba(255,213,74,.16)",g2:"rgba(90,60,170,.24)",bd:"rgba(255,213,74,.2)",amb:["✨","🎆","✨","🥂","✨","🎇"],mark:"🎆"},
+ winter:{a:"#3B82C4",k:"#7CC4FF",soft:"rgba(124,196,255,.16)",grad:"linear-gradient(135deg,#9AD6FF 0%,#3B82C4 55%,#2A3A7A 100%)",g1:"rgba(124,196,255,.16)",g2:"rgba(60,90,180,.20)",bd:"rgba(124,196,255,.18)",amb:["❄️","❄️","❄️","❄️","❄️","⛄"],mark:"❄️"},
+ party:{a:"#D6336C",k:"#FF6BB5",soft:"rgba(255,107,181,.16)",grad:"linear-gradient(135deg,#FFD60A 0%,#FF6BB5 45%,#3CCFE6 100%)",g1:"rgba(255,107,181,.18)",g2:"rgba(60,207,230,.18)",bd:"rgba(255,214,10,.2)",amb:["🎊","🎉","🎭","🎊","🎶","🎉"],mark:"🎭"},
+ love:{a:"#D63A6B",k:"#FF6B9A",soft:"rgba(255,107,154,.16)",grad:"linear-gradient(135deg,#FF9AB8 0%,#D63A6B 55%,#7A1F45 100%)",g1:"rgba(255,107,154,.18)",g2:"rgba(150,40,90,.22)",bd:"rgba(255,107,154,.2)",amb:["❤️","💕","💗","❤️","💞"],mark:"❤️"},
+ easter:{a:"#8E6FD6",k:"#C9A7FF",soft:"rgba(201,167,255,.16)",grad:"linear-gradient(135deg,#FFE08A 0%,#C9A7FF 50%,#7ED9B5 100%)",g1:"rgba(255,224,138,.14)",g2:"rgba(126,217,181,.18)",bd:"rgba(201,167,255,.2)",amb:["🥚","🐣","🌷","🐰","🥚","🌼"],mark:"🐣"},
+ spring:{a:"#3FA66B",k:"#7EE0A6",soft:"rgba(126,224,166,.16)",grad:"linear-gradient(135deg,#FFB7D5 0%,#7EE0A6 55%,#2F8F5B 100%)",g1:"rgba(255,183,213,.14)",g2:"rgba(126,224,166,.18)",bd:"rgba(126,224,166,.18)",amb:["🌸","🌷","🌱","🦋","🌸","🌼"],mark:"🌸"},
+ summer:{a:"#0FA3B1",k:"#3FE0D0",soft:"rgba(63,224,208,.16)",grad:"linear-gradient(135deg,#FFD60A 0%,#FF9F45 40%,#0FA3B1 100%)",g1:"rgba(255,214,10,.16)",g2:"rgba(15,163,177,.22)",bd:"rgba(63,224,208,.18)",amb:["☀️","🌊","🍉","🌴","☀️","🍦"],mark:"☀️"},
+ swiss:{a:"#DA291C",k:"#FF4B3E",soft:"rgba(218,41,28,.18)",grad:"linear-gradient(135deg,#FF6B5E 0%,#DA291C 60%,#8E1810 100%)",g1:"rgba(218,41,28,.22)",g2:"rgba(255,255,255,.06)",bd:"rgba(255,255,255,.14)",amb:["🇨🇭","🎆","✨","🇨🇭","🎇"],mark:"🇨🇭"},
+ autumn:{a:"#C4661F",k:"#FF9B4A",soft:"rgba(255,155,74,.16)",grad:"linear-gradient(135deg,#FFC069 0%,#C4661F 55%,#6B3410 100%)",g1:"rgba(255,155,74,.16)",g2:"rgba(140,70,20,.22)",bd:"rgba(255,155,74,.18)",amb:["🍂","🍁","🍂","🍎","🍂","🌰"],mark:"🍂"},
+ lantern:{a:"#D9822B",k:"#FFB547",soft:"rgba(255,181,71,.16)",grad:"linear-gradient(135deg,#FFD27A 0%,#D9822B 55%,#5A2D0C 100%)",g1:"rgba(255,181,71,.18)",g2:"rgba(90,45,12,.25)",bd:"rgba(255,181,71,.18)",amb:["🏮","🍁","✨","🏮","🍂"],mark:"🏮"}
+};
+function themeNow(){if(state&&state.settings&&state.settings.themeOff)return null;const s=seasonNow();const id=s&&THEME_OF[s.id];return id?{id,...THEMES[id]}:null}
+let themeApplied=null;
+function applyTheme(){
+  const t=themeNow(),id=t?t.id:"";if(id===themeApplied)return;themeApplied=id;
+  const old=document.getElementById("thcss");if(old)old.remove();const amb=document.getElementById("ambient");if(amb)amb.remove();
+  document.body.className=document.body.className.replace(/\bth-\S+/g,"").trim();
+  if(!t)return;
+  document.body.classList.add("th-on","th-"+t.id);
+  const st=document.createElement("style");st.id="thcss";
+  const web=`url("data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="1"><path d="M120 0L20 100M120 0L60 110M120 0L95 118M120 0L10 60M120 0L0 25"/><path d="M95 0Q100 20 120 25M70 0Q78 38 120 50M45 0Q55 58 120 75M22 0Q32 80 120 102"/><line x1="78" y1="44" x2="78" y2="70" stroke="rgba(255,255,255,.35)"/><circle cx="78" cy="74" r="4" fill="rgba(20,10,20,.9)" stroke="rgba(255,255,255,.4)"/></svg>')}")`;
+  st.textContent=`:root{--accent:${t.a};--accent-soft:${t.soft};--kcal:${t.k};--grad:${t.grad}}
+  .th-on .card{border-color:${t.bd}}
+  .th-on .tabbar{box-shadow:0 0 0 1px ${t.bd},0 10px 30px rgba(0,0,0,.4)}
+  .th-on .tbplus{box-shadow:0 8px 22px ${t.soft.replace(/[\d.]+\)$/,".55)")}}
+  .th-on .card:has(.summary){position:relative;overflow:hidden}
+  .th-on .card:has(.summary)::after{content:"${t.mark}";position:absolute;left:-18px;bottom:-26px;font-size:120px;opacity:.07;pointer-events:none;transform:rotate(-12deg)}
+  ${t.web?`.th-on .card:has(.summary)::before{content:"";position:absolute;right:0;top:0;width:120px;height:120px;background:${web} no-repeat top right/contain;pointer-events:none}`:""}
+  ${t.lights?`.th-on .card:has(.summary)::before{content:"";position:absolute;left:14px;right:14px;top:6px;height:10px;pointer-events:none;background:radial-gradient(circle,#FF4D5E 0 3px,transparent 4px) 0 0/48px 10px repeat-x,radial-gradient(circle,#FFD54A 0 3px,transparent 4px) 16px 0/48px 10px repeat-x,radial-gradient(circle,#4ADE80 0 3px,transparent 4px) 32px 0/48px 10px repeat-x;filter:drop-shadow(0 0 4px rgba(255,220,120,.8))}@media (prefers-reduced-motion:no-preference){.th-on .card:has(.summary)::before{animation:twk 1.4s steps(2) infinite}}@keyframes twk{50%{opacity:.55}}`:""}
+  .th-on .disp{text-shadow:0 0 18px ${t.soft}}
+  html{background:#070508}body.th-on{background:transparent!important}
+  .th-on .eatbtn{background:${t.grad};color:#fff;box-shadow:0 8px 24px ${t.soft}}.th-on .eatbtn small{opacity:.85}`;
+  document.head.appendChild(st);
+  const a=document.createElement("div");a.id="ambient";a.setAttribute("aria-hidden","true");
+  a.style.background=`radial-gradient(90% 45% at 100% 0%,${t.g1},transparent 70%),radial-gradient(80% 45% at 0% 100%,${t.g2},transparent 70%)`;
+  for(let i=0;i<9;i++){const sp=document.createElement("span");sp.textContent=t.amb[i%t.amb.length];sp.style.left=(4+Math.random()*88)+"%";sp.style.top=(6+Math.random()*84)+"%";sp.style.fontSize=(18+Math.random()*18).toFixed(0)+"px";sp.style.animationDelay=(-Math.random()*16).toFixed(1)+"s";sp.style.animationDuration=(12+Math.random()*10).toFixed(1)+"s";a.appendChild(sp)}
+  document.body.prepend(a);
+}
 /* ---- Haupt-Render ---- */
 function render(){
+  try{applyTheme()}catch(e){}
   try{dietBreakCheck()}catch(e){}
   try{tsMigrate()}catch(e){}
   const G=gameNow();
@@ -3934,6 +3984,7 @@ document.getElementById("app").addEventListener("click",e=>{
   if(a==="bklater"){state.settings.bkSnooze=todayKey();persist("settings");render();return}
   if(a==="gym"){openGym();return}
   if(a==="diets"){openDiets();return}
+  if(a==="themetgl"){state.settings.themeOff=!state.settings.themeOff;persist("settings");render();toast(state.settings.themeOff?"Saison-Design aus":"Saison-Design an 🎨");return}
   if(a==="festok"){state.settings.festSeen=(state.settings.festSeen||[]).concat([t.dataset.k]).slice(-40);persist("settings");render();return}
   if(a==="plan"){openPlan();return}
   if(a==="calprev"){calOff--;render();return}
