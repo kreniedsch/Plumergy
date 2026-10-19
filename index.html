@@ -736,6 +736,29 @@ details.how p{margin:4px 0 0;font-size:12.8px;line-height:1.45;color:var(--muted
 .wubox b{color:#FF9F0A}
 .wubtn{border:0;background:rgba(255,159,10,.14);color:#FF9F0A;border-radius:999px;padding:4px 10px;font-size:12px;font-weight:700;margin-left:auto}
 .dlcard{border:1px solid rgba(60,207,230,.3);background:linear-gradient(135deg,rgba(60,207,230,.12),rgba(110,240,176,.08))}
+.supps{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.supp{border:0;border-radius:999px;background:var(--surface2);color:var(--ink);font-weight:700;font-size:14px;padding:9px 14px 9px 10px;display:flex;align-items:center;gap:7px}
+.supp span{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:var(--surface3);font-size:13px}
+.supp.on{background:rgba(110,240,176,.16);box-shadow:inset 0 0 0 1.5px rgba(110,240,176,.55)}
+.supp.on span{background:#6EF0B0;color:#06281A;font-weight:900}
+.supprow{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.sdel{border:0;background:var(--surface3);color:var(--muted);border-radius:999px;font-size:12px;font-weight:700;padding:7px 11px}
+.supph{display:grid;grid-template-columns:repeat(14,1fr);gap:4px;margin-top:6px}
+.supph i{height:22px;border-radius:6px;background:var(--surface2)}
+.supph i.part{background:linear-gradient(0deg,rgba(110,240,176,.55) 50%,var(--surface2) 50%)}
+.supph i.all{background:#6EF0B0}
+.p30{display:flex;align-items:center;gap:14px;margin-top:8px}
+.p30n{display:flex;align-items:baseline;gap:4px;flex:0 0 auto}
+.p30n b{font-size:38px;font-weight:900;color:#6EF0B0;line-height:1}
+.p30n span{color:var(--muted);font-weight:700}
+.p30bar{flex:1;height:12px;border-radius:999px;background:var(--surface2);overflow:hidden}
+.p30bar i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#6EF0B0,#3CCFE6)}
+.p30g{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.p30g small{color:var(--muted);font-size:12px;font-weight:700}
+.p30c{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
+.p30c span{background:var(--surface2);border-radius:999px;padding:5px 10px;font-size:12.5px;font-weight:600}
+.p30c span.try{background:rgba(110,240,176,.10);box-shadow:inset 0 0 0 1px rgba(110,240,176,.35)}
+.cvitem .tktip{grid-column:1/-1;color:var(--ink);opacity:.85;line-height:1.35}
 </style>
 <style>
 html{background:#070508}
@@ -1422,6 +1445,7 @@ function searchListHTML(){
   listCache={sn:SNDB,recent:recentFoods(),mine:state.foods,db:DBFOODS,off:offList,rec:RECIPE_FOODS,web:(sheet.web||[]).map(offFrom)};
   let h="";
   if(!q){
+    h+=`<button type="button" class="copybtn" data-takeaway="1" style="width:100%;margin:2px 0 6px">🥙 Take-away-Kompass: Kebab, Pizza, Burger …</button>`;
     if(state.favs.length) h+=`<div class="sec-l">Lieblingsmahlzeiten</div><ul class="flist">${state.favs.map((fv,i)=>{const t=sumList(fv.items);return `<li class="fi" data-fav="${i}"><div class="t"><div class="n"><span class="favstar">${ICON_STAR}</span>${esc(fv.name)}</div><div class="m num">${fv.items.length} Lebensmittel · ${r0(t.k)} kcal · E ${r0(t.p)} · K ${r0(t.c)} · F ${r0(t.f)}</div></div><button class="xbtn" type="button" data-delfav="${i}" aria-label="${esc(fv.name)} löschen">×</button><div class="plus">+</div></li>`}).join("")}</ul>`;
     if(listCache.recent.length) h+=`<div class="sec-l">Zuletzt gegessen</div><ul class="flist">${listCache.recent.map((f,i)=>foodRow(f,i,"recent")).join("")}</ul>`;
     if(state.foods.length) h+=`<div class="sec-l">Meine Lebensmittel</div><ul class="flist">${state.foods.map((f,i)=>foodRow(f,i,"mine")).join("")}</ul>`;
@@ -2034,6 +2058,7 @@ function bindSheet(){
       const fl=e.target.closest("[data-fav]");
       if(fl){const fv=state.favs[+fl.dataset.fav];if(!fv)return;const d=getDay(selDate);fv.items.forEach(it=>d.meals[sheet.meal].push({...it,id:uid()}));persist("d-"+selDate);render();toast(`${fv.name} hinzugefügt`);closeSheet();return}
       if(e.target.closest("[data-web]")){runWebSearch();return}
+      if(e.target.closest("[data-takeaway]")){openTake(sheet.meal);return}
       const li=e.target.closest(".fi");if(!li)return;const f=listCache[li.dataset.src][+li.dataset.idx];if(!f)return;
       if(li.dataset.src==="web")offKeep(sheet.web[+li.dataset.idx]);
       sheet.food={n:f.b&&(li.dataset.src==="off"||li.dataset.src==="web")?f.n+" ("+f.b+")":f.n,k:f.k,p:f.p,c:f.c,f:f.f,pg:f.pg,pl:f.pl,bc:f.bc||f.lbc||null};sheet.grams=f.lastG||f.pg||100;sheet.step="detail";renderSheet()};
@@ -2983,6 +3008,7 @@ function todayHTML(G){
   });
   const wg=state.settings.waterGoal||8;let gl="";for(let i=0;i<wg;i++)gl+=`<button type="button" class="glass ${i<day.water?"full":""}" data-glass="${i}" aria-label="${i+1} Glas"></button>`;
   h+=`<section class="card water"><div class="sec"><h2 class="disp">Wasser</h2><small class="num">${(day.water*0.25).toFixed(2).replace(/0$/,"")} / ${(wg*0.25).toFixed(2).replace(/0$/,"")} l</small></div><div class="glasses">${gl}</div></section>`;
+  h+=suppCardHTML();
   h+=gymCardHTML();
   h+=activityCardHTML();
   h+=diaryHTML();
@@ -3013,6 +3039,7 @@ function foodHTML(){
     <button class="tile" type="button" data-act="diets"><span class="ic">🫒</span><b>Diät & Fasten</b><small>${DSTYLES[state.settings.dstyle||"none"].n}${fastCfg().on?" · "+winLbl():""}</small></button>
     <button class="tile" type="button" data-act="gym"><span class="ic">🏋️</span><b>Training</b><small>${PROGS[gymProg()].n}</small></button>
     <button class="tile" type="button" data-act="plan" style="grid-column:1/-1;background:linear-gradient(135deg,rgba(110,240,176,.16),rgba(60,207,230,.14))"><span class="ic">🛒</span><b>Wochenplan & Einkaufsliste</b><small>${(()=>{const n=planOf().items.length;return n?`${n} Rezept${n===1?"":"e"} geplant · Liste nach Migros, Coop, Lidl`:"Rezepte für die Woche wählen, Einkaufsliste automatisch"})()}</small></button>
+    <button class="tile" type="button" data-act="take" style="grid-column:1/-1;background:linear-gradient(135deg,rgba(255,214,10,.14),rgba(255,122,69,.16))"><span class="ic">🥙</span><b>Take-away-Kompass</b><small>Kebab, Pizza, Burger & Co.: Kalorien und die bessere Wahl</small></button>
     <button class="tile" type="button" data-act="crave" style="grid-column:1/-1;background:linear-gradient(135deg,rgba(255,122,69,.18),rgba(214,115,196,.16))"><span class="ic">🍫</span><b>Craving-SOS & schnelle Snacks</b><small>Was du jetzt im Laden holen kannst, passend zu deinem Budget</small></button>
     <button class="tile" type="button" data-guide="rec" data-gcat="Dessert" style="grid-column:1/-1;background:linear-gradient(135deg,rgba(255,159,10,.16),rgba(214,115,196,.18))"><span class="ic">🍨</span><b>Desserts</b><small>${RECIPES.filter(r=>r.cat==="Dessert").length} Protein-Desserts: Mousse, Cheesecake, Brownies, Tiramisu …</small></button>
   </div>
@@ -3031,7 +3058,7 @@ function progressHTML(G){
   </section>
   <section class="card"><div class="sec"><h2 class="disp">Badges</h2><small class="hint num">${G.unlocked.length} von ${BADGES.length}</small></div>
     <div class="badges">${BADGES.map(b=>{const on=G.unlocked.includes(b[0]);return `<button type="button" class="bdg ${on?"":"lock"}" data-badge="${b[0]}"><i>${on?b[1]:"🔒"}</i>${esc(b[2])}</button>`}).join("")}</div></section>
-  ${reportHTML()}${strengthCardHTML()}${calendarHTML()}${albumHTML()}${weightCardHTML()}${measCardHTML()}${analysisCardHTML()}
+  ${plantsCardHTML()}${reportHTML()}${strengthCardHTML()}${calendarHTML()}${albumHTML()}${weightCardHTML()}${measCardHTML()}${analysisCardHTML()}
   </div>`;
 }
 
@@ -3054,6 +3081,7 @@ function profileHTML(G){
     <button class="rowb" type="button" data-act="themetgl"><i class="ri" style="background:rgba(255,159,10,.16)">🎨</i><span>Saison-Design: <b>${state.settings.themeOff?"Aus":"An"}</b>${(()=>{const s=seasonNow();return s&&!state.settings.themeOff?" "+s.deco:""})()}</span><em>↻</em></button>
     <button class="rowb" type="button" data-act="diets"><i class="ri" style="background:rgba(214,115,196,.18)">🥗</i><span>Diät & Fasten: <b>${DSTYLES[state.settings.dstyle||"none"].n}${fastCfg().on?" · "+(FAST_TYPES.find(x=>x[0]===fastCfg().len)||[,""])[1]:""}${state.settings.cycle?" · Zyklus":""}</b></span><em>›</em></button>
     <button class="rowb" type="button" data-act="gym"><i class="ri" style="background:rgba(110,240,176,.15)">🏋️</i><span>Krafttraining</span><em>›</em></button>
+    <button class="rowb" type="button" data-act="suppedit"><i class="ri" style="background:rgba(110,240,176,.15)">💊</i><span>Supplemente & Vitamin D</span><em>›</em></button>
     <button class="rowb" type="button" data-act="plan"><i class="ri" style="background:rgba(255,159,10,.16)">🛒</i><span>Wochenplan & Einkaufsliste</span><em>›</em></button>
     ${typeof mode!=="undefined"&&mode==="cloud"?"":`<button class="rowb" type="button" data-act="backup"><i class="ri" style="background:rgba(10,132,255,.18)">🛟</i><span>Daten sichern${state.settings.lastBackup?` <small class="hint">· zuletzt ${parseKey(state.settings.lastBackup).toLocaleDateString("de-CH",{day:"numeric",month:"short"})}</small>`:""}</span><em>›</em></button>`}
     <button class="rowb" type="button" data-act="checkin"><i class="ri" style="background:rgba(60,207,230,.16)">📋</i><span>Check-in jetzt machen</span><em>›</em></button>
@@ -3092,6 +3120,7 @@ function remindersHTML(){
     if(h>=20&&!d.meals.d.length)R.push({id:"dinner",ic:"🍝",t:"Abendessen erfassen",s:"Damit deine Tagesbilanz stimmt und die Quest zählt.",btn:"Abendessen",act:"radd",meal:"d"});
   }
   if(h>=15&&(d.water||0)<wg/2)R.push({id:"water",ic:"💧",t:`Erst ${d.water||0} von ${wg} Gläsern`,s:"Ein Glas Wasser jetzt hilft gegen Hunger und Müdigkeit.",btn:"+1 Glas",act:"rwater"});
+  {const sr=state.settings.suppRem===undefined?12:state.settings.suppRem,sl=suppList();if(!state.settings.suppOff&&sr&&sl.length&&h>=sr&&!suppAll(tk)){const op=sl.filter(x=>!suppDone(tk).includes(x.id));R.push({id:"supp",ic:"💊",t:"Supplemente noch offen",s:op.map(x=>x.n).join(", "),btn:"Alle abhaken",act:"suppall"})}}
   const g=goalsFor(tk);
   if(h>=18&&t.n>=2&&t.p<g.p*0.6)R.push({id:"protein",ic:"💪",t:`Noch ${r0(g.p-t.p)} g Eiweiss offen`,s:"Magerquark, Skyr, Poulet oder ein Shake bringen dich schnell ans Ziel.",btn:"Erfassen",act:"radd",meal:"d"});
   return R.filter(r=>!dis.includes(r.id)).slice(0,2).map(r=>`<div class="rem ${r.fire?"fire":""}"><span class="ri2">${r.ic}</span><div><b>${esc(r.t)}</b><small>${esc(r.s)}</small></div><div class="ra"><button type="button" class="rbtn" data-act="${r.act}" ${r.meal?`data-meal="${r.meal}"`:""}>${esc(r.btn)}</button><button type="button" class="rx" data-act="rdismiss" data-rid="${r.id}">Später</button></div></div>`).join("");
@@ -3382,6 +3411,148 @@ function renderCrave(){
     state.settings.swaps=(state.settings.swaps||0)+1;persist("settings");persist("d-"+tk);selDate=tk;closeSheet();render();toast(`👌 Smart Swap: ${i.n} eingetragen`);
   });
 }
+/* ---- Supplemente ---- */
+const SUPP_DEF=[{id:"collagen",n:"ProCollagen",ic:"💧"},{id:"bstrong",n:"B-Strong",ic:"⚡"},{id:"sport",n:"Sport",ic:"🏃"},{id:"propolis",n:"Propolis",ic:"🐝"}];
+const SUPP_QUICK=[["vitd","Vitamin D","☀️"],["omega3","Omega-3","🐟"],["magnesium","Magnesium","🌙"],["kreatin","Kreatin","💪"],["multi","Multivitamin","💊"],["zink","Zink","🛡️"],["eisen","Eisen","🩸"]];
+const SUPP_REM=[[0,"Aus"],[8,"8 Uhr"],[12,"12 Uhr"],[18,"18 Uhr"],[21,"21 Uhr"]];
+function suppList(){const s=state.settings.supps;return Array.isArray(s)?s:SUPP_DEF}
+function suppDone(k){const d=state.days[k];return d&&Array.isArray(d.supp)?d.supp:[]}
+function suppAll(k){const L=suppList();if(!L.length)return false;const d=suppDone(k);return L.every(x=>d.includes(x.id))}
+function suppStreak(){const tk=todayKey();let k=suppAll(tk)?tk:shift(tk,-1),n=0;while(n<400&&suppAll(k)){n++;k=shift(k,-1)}return n}
+function suppWinter(){const m=parseKey(todayKey()).getMonth()+1;return m>=10||m<=3}
+function suppSave(k){persist("d-"+k)}
+function suppToggle(id){const k=selDate,d=getDay(k);d.supp=Array.isArray(d.supp)?d.supp.slice():[];const i=d.supp.indexOf(id);if(i>=0)d.supp.splice(i,1);else d.supp.push(id);suppSave(k);render();if(i<0&&suppAll(k)){const st=suppStreak();toast(`💊 Alle Supplemente genommen${st>1&&k===todayKey()?` · 🔥 ${st} Tage am Stück`:""}`)}}
+function suppTakeAll(){const k=todayKey(),d=getDay(k);d.supp=suppList().map(x=>x.id);suppSave(k);selDate=k;render();toast("💊 Alle Supplemente abgehakt")}
+function suppCardHTML(){
+  const s=state.settings;if(s.suppOff)return "";const L=suppList();
+  const done=suppDone(selDate),n=L.filter(x=>done.includes(x.id)).length,st=suppStreak();
+  const vd=suppWinter()&&!L.some(x=>/vitamin ?d|vit\. ?d/i.test(x.n));
+  return `<section class="card"><div class="sec"><h2 class="disp">Supplemente</h2><small class="hint num">${L.length?`${n}/${L.length}`:""}${st&&selDate===todayKey()?` · 🔥 ${st}`:""}</small></div>
+  ${L.length?`<div class="supps">${L.map(x=>{const on=done.includes(x.id);return `<button type="button" class="supp ${on?"on":""}" data-supp="${esc(x.id)}" aria-pressed="${on}"><span>${on?"✓":esc(x.ic||"💊")}</span>${esc(x.n)}</button>`}).join("")}</div>`:`<p class="hint" style="margin:8px 0 0">Noch keine Supplemente eingetragen.</p>`}
+  <div class="supprow">${vd?`<button type="button" class="copybtn" data-act="suppedit">☀️ Vitamin D im Winter?</button>`:""}<button type="button" class="copybtn" data-act="suppedit">✏️ Bearbeiten</button></div></section>`;
+}
+function openSupp(){sheet={kind:"supp",q:""};document.body.style.overflow="hidden";renderSupp()}
+function renderSupp(){
+  if(!sheet||sheet.kind!=="supp")return;
+  const s=state.settings,L=suppList(),root=document.getElementById("sheetRoot"),tk=todayKey(),rem=s.suppRem===undefined?12:s.suppRem;
+  const quick=SUPP_QUICK.filter(q=>!L.some(x=>x.id===q[0]||x.n.toLowerCase()===q[1].toLowerCase()));
+  let hist="";for(let i=13;i>=0;i--){const k=shift(tk,-i),d=suppDone(k),c=L.filter(x=>d.includes(x.id)).length;hist+=`<i class="${L.length&&c===L.length?"all":c?"part":""}" title="${k}"></i>`}
+  root.innerHTML=`<div class="backdrop" id="bd"></div><div class="sheet ${sheet._shown?"":"anim"}" role="dialog" aria-modal="true"><div class="sheet-h"><div class="grab"></div><div class="sheet-t"><h3>Supplemente</h3><button class="btn ghost" style="height:36px" id="closeS" type="button">Fertig</button></div></div>
+  <div class="sheet-b" id="sb">
+    <div class="sec-l">Meine Supplemente</div>
+    ${L.length?`<ul class="flist">${L.map((x,i)=>`<li class="fi"><div class="t"><div class="n">${esc(x.ic||"💊")} ${esc(x.n)}</div></div><button type="button" class="sdel" data-sdel="${i}" aria-label="${esc(x.n)} entfernen">Entfernen</button></li>`).join("")}</ul>`:`<p class="hint">Noch nichts eingetragen.</p>`}
+    <div style="display:flex;gap:8px;margin-top:10px"><input class="inp" id="sNew" placeholder="z.B. Vitamin D3" maxlength="30" autocomplete="off" value="${esc(sheet.q)}"><button type="button" class="btn" id="sAdd" style="flex:0 0 auto;height:48px">Hinzufügen</button></div>
+    ${quick.length?`<div class="supps" style="margin-top:8px">${quick.map(q=>`<button type="button" class="chip" data-squick="${q[0]}">+ ${q[2]} ${esc(q[1])}</button>`).join("")}</div>`:""}
+    <div class="sec-l">Letzte 14 Tage</div>
+    <div class="supph">${hist}</div>
+    <p class="hint" style="margin:6px 0 0;font-size:12px">Grün = alles genommen, halb = teilweise.</p>
+    <div class="sec-l">Erinnerung bei «Heute»</div>
+    <div class="supps">${SUPP_REM.map(([v,l])=>`<button type="button" class="chip ${rem===v?"on":""}" data-srem="${v}">${l}</button>`).join("")}</div>
+    <div class="sos" style="margin-top:14px"><b>☀️ Vitamin D im Schweizer Winter</b><br>Von Oktober bis März steht die Sonne bei uns so tief, dass die Haut kaum Vitamin D bilden kann. Dunkle Haut bildet bei gleicher Sonne weniger davon, darum ist ein Mangel im Winter häufiger.<br><br>Die Eidgenössische Ernährungskommission empfiehlt Erwachsenen <b>600 IE (15 µg) pro Tag</b>, ab 60 Jahren 800 IE. Mehr als 4000 IE pro Tag nur nach ärztlicher Absprache.<br><br>Am besten lässt du beim Hausarzt deinen Vitamin-D-Wert im Blut messen. Dann weisst du, ob und wie viel du brauchst. Schau auch auf deinen Packungen, ob schon Vitamin D drin ist, damit du nicht doppelt nimmst.<br><br>Vitamin D steckt auch in fettem Fisch (Lachs, Hering, Makrele), Eiern und angereicherten Milchprodukten.</div>
+    <p class="hint" style="margin:10px 0 0;font-size:12px">Plumergy ersetzt keine ärztliche Beratung. Bei Fragen zu Supplementen: Hausarzt oder Apotheke.</p>
+    <button type="button" class="btn ghost" id="sOff" style="width:100%;margin-top:12px">${s.suppOff?"Karte bei «Heute» wieder zeigen":"Karte bei «Heute» ausblenden"}</button>
+  </div></div>`;
+  sheet._shown=true;
+  const $=id=>document.getElementById(id);
+  const save=L2=>{state.settings.supps=L2;persist("settings");render();renderSupp()};
+  $("closeS").onclick=closeSheet;$("bd").onclick=closeSheet;
+  $("sNew").oninput=e=>{sheet.q=e.target.value};
+  const add=()=>{const n=(sheet.q||"").trim().slice(0,30);if(!n)return;if(L.some(x=>x.n.toLowerCase()===n.toLowerCase())){toast("Ist schon in der Liste");return}const q=SUPP_QUICK.find(x=>x[1].toLowerCase()===n.toLowerCase());sheet.q="";save(L.concat([{id:q?q[0]:"s"+uid(),n,ic:q?q[2]:"💊"}]));toast(`${n} hinzugefügt`)};
+  $("sAdd").onclick=add;$("sNew").onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();add()}};
+  root.querySelectorAll("[data-squick]").forEach(b=>b.onclick=()=>{const q=SUPP_QUICK.find(x=>x[0]===b.dataset.squick);if(q){save(L.concat([{id:q[0],n:q[1],ic:q[2]}]));toast(`${q[1]} hinzugefügt`)}});
+  root.querySelectorAll("[data-sdel]").forEach(b=>b.onclick=()=>{if(b.dataset.c!=="1"){b.dataset.c="1";b.textContent="Sicher?";return}const L2=L.slice();L2.splice(+b.dataset.sdel,1);save(L2)});
+  root.querySelectorAll("[data-srem]").forEach(b=>b.onclick=()=>{state.settings.suppRem=+b.dataset.srem;persist("settings");render();renderSupp()});
+  $("sOff").onclick=()=>{state.settings.suppOff=!state.settings.suppOff;persist("settings");render();renderSupp()};
+}
+
+/* ---- 30 Pflanzen pro Woche ---- */
+// [Name, Emoji, Gruppe, Suchmuster, Punkte]  Gruppen: g Gemüse, o Früchte, h Hülsenfrüchte, k Vollkorn, n Nüsse & Samen, w Kräuter & Gewürze (¼)
+const PLANT_GRP={g:["🥦","Gemüse"],o:["🍎","Früchte"],h:["🫘","Hülsenfrüchte"],k:["🌾","Vollkorn"],n:["🥜","Nüsse & Samen"],w:["🌿","Kräuter & Gewürze"]};
+const PLANTS_RAW=[
+["Tomaten","🍅","g","tomate|pelati|passata|cherrytom"],["Gurke","🥒","g","gurke|cornichon"],["Zucchetti","🥒","g","zucchet|zucchini"],["Aubergine","🍆","g","aubergine"],["Peperoni","🫑","g","peperon|paprika ?(rot|gelb|grün|mix)|paprikaschote"],["Zwiebeln","🧅","g","zwiebel|schalotte"],["Rüebli","🥕","g","rüebli|karotte|möhre"],["Broccoli","🥦","g","broccoli|brokkoli"],["Blumenkohl","🥦","g","blumenkohl"],["Rosenkohl","🥬","g","rosenkohl"],["Federkohl","🥬","g","federkohl|grünkohl|kale"],["Kabis & Kohl","🥬","g","kabis|weisskohl|rotkohl|wirz|chinakohl|spitzkohl|sauerkraut"],["Spinat","🥬","g","spinat"],["Mangold","🥬","g","mangold"],["Lauch","🧅","g","(^|[^rt])lauch|porree"],["Sellerie","🥬","g","sellerie"],["Fenchel","🌿","g","fenchel"],["Randen","🟣","g","(^|[^g])rande(n|\\b)|rote bete"],["Kürbis","🎃","g","kürbis(?!kern)"],["Süsskartoffel","🍠","g","süsskartoffel"],["Kartoffeln","🥔","g","(^|[^s])kartoffel|härdöpfel|rösti"],["Pilze","🍄","g","pilz|champignon|shiitake"],["Spargeln","🌱","g","spargel"],["Erbsen","🫛","g","(^|[^r])erbse|zuckererbse|kefe"],["Mais","🌽","g","mais(?!stärke)|polenta|popcorn"],["Radiesli & Rettich","🌱","g","radies|rettich"],["Kohlrabi","🥬","g","kohlrabi"],["Artischocken","🌱","g","artischock"],["Grüne Bohnen","🫛","g","grüne bohne|buschbohne|bohnen grün|fisole"],["Kopfsalat & Blattsalat","🥬","g","blattsalat|kopfsalat|eisberg|lattich|romana|batavia|salatmix|gemischter salat|grüner salat"],["Rucola","🥬","g","rucola"],["Nüsslisalat","🥬","g","nüsslisalat|feldsalat"],["Chicorée","🥬","g","chicorée|chicoree|endivie|radicchio"],["Avocado","🥑","o","avocado"],["Oliven","🫒","o","olive(?!nöl)"],
+["Äpfel","🍎","o","(^|[^t])apfel|äpfel|bircher"],["Birnen","🍐","o","birne"],["Bananen","🍌","o","banane"],["Erdbeeren","🍓","o","erdbeer"],["Himbeeren","🫐","o","himbeer"],["Heidelbeeren","🫐","o","heidelbeer|blaubeer"],["Brombeeren","🫐","o","brombeer"],["Johannisbeeren","🫐","o","johannisbeer|cassis"],["Beeren-Mix","🫐","o","beerenmix|waldbeer|mixed berr"],["Kirschen","🍒","o","kirsche"],["Aprikosen","🍑","o","aprikose"],["Pfirsiche","🍑","o","pfirsich|nektarine"],["Zwetschgen","🟣","o","zwetschg|pflaume"],["Trauben","🍇","o","traube(?!nzucker)|rosine|sultanine"],["Orangen","🍊","o","orange|mandarine|clementine"],["Zitronen","🍋","o","zitrone"],["Limetten","🍋","o","limette"],["Grapefruit","🍊","o","grapefruit"],["Kiwi","🥝","o","kiwi"],["Mango","🥭","o","mango"],["Ananas","🍍","o","ananas"],["Melone","🍈","o","melone"],["Granatapfel","🔴","o","granatapfel"],["Datteln","🟤","o","dattel"],["Feigen","🟣","o","feige"],["Rhabarber","🌱","o","rhabarber"],["Cranberries","🔴","o","cranberr"],["Quitten","🍐","o","quitte"],
+["Linsen","🫘","h","linse|\\bdal\\b"],["Kichererbsen","🫘","h","kichererbse|hummus|falafel"],["Bohnen","🫘","h","kidney|weisse bohne|schwarze bohne|borlotti|cannellini|bohnen ?\\(dose|baked beans|chili con carne"],["Soja","🫘","h","tofu|tempeh|edamame|soja(?!sauce|sosse|sauce)"],["Erdnüsse","🥜","h","erdnuss"],
+["Hafer","🌾","k","hafer|porridge|oats|bircher|müesli"],["Vollkornweizen","🌾","k","vollkorn(?!reis)|ruchbrot|grahambrot"],["Dinkel","🌾","k","dinkel"],["Roggen","🌾","k","roggen"],["Quinoa","🌾","k","quinoa"],["Bulgur","🌾","k","bulgur|taboul"],["Buchweizen","🌾","k","buchweizen"],["Hirse","🌾","k","hirse"],["Gerste","🌾","k","gerste"],["Naturreis","🌾","k","naturreis|vollkornreis|vollreis|wildreis"],["Amaranth","🌾","k","amaranth"],
+["Mandeln","🥜","n","mandel"],["Baumnüsse","🌰","n","baumnuss|walnuss|baumnüsse|walnüsse"],["Haselnüsse","🌰","n","haselnuss|haselnüsse"],["Cashews","🥜","n","cashew"],["Pistazien","🥜","n","pistazie"],["Marroni","🌰","n","marroni|kastanie|vermicelles"],["Kokos","🥥","n","kokos"],["Leinsamen","🌱","n","leinsamen"],["Chiasamen","🌱","n","chia"],["Kürbiskerne","🎃","n","kürbiskern"],["Sonnenblumenkerne","🌻","n","sonnenblumenkern"],["Sesam","🌱","n","sesam|tahin"],["Hanfsamen","🌱","n","hanfsamen"],["Pekannüsse","🌰","n","pekan|macadamia|paranuss"],
+["Knoblauch","🧄","w","knoblauch|bärlauch"],["Ingwer","🫚","w","ingwer"],["Zimt","🟤","w","zimt"],["Kurkuma","🟡","w","kurkuma"],["Kreuzkümmel","🟤","w","kreuzkümmel|cumin"],["Curry","🟡","w","curry"],["Paprika (Gewürz)","🌶️","w","paprika ?(pulver|fum|edel|geräuchert|scharf|süss|gewürz)|(tl|el|prise) paprika|(^|[,|]\\s*)paprika\\s*(,|$|\\|)"],["Chili","🌶️","w","chili(?! con)|sriracha|chipotle"],["Pfeffer","⚫","w","pfeffer(?!minz)"],["Basilikum","🌿","w","basilikum|pesto"],["Petersilie","🌿","w","petersilie"],["Schnittlauch","🌿","w","schnittlauch"],["Koriander","🌿","w","koriander"],["Minze","🌿","w","minze"],["Dill","🌿","w","\\bdill"],["Rosmarin","🌿","w","rosmarin"],["Thymian","🌿","w","thymian"],["Oregano","🌿","w","oregano"],["Muskat","🟤","w","muskat"],["Vanille","🌼","w","vanille(?!.*(glace|pudding|drink|shake|protein|skyr|quark|joghurt))"],["Kakao","🍫","w","kakao|dunkle schokolade|schokolade 7|schokolade 8"]
+];
+const PLANTS=PLANTS_RAW.map(([n,ic,g,re])=>({n,ic,g,re:new RegExp(re,"i"),w:g==="w"?.25:1}));
+const PLANT_SKIP=/saft|sirup|schorle|ice ?tea|eistee|limo|aroma|bonbon|gummi|zero|energy|glace|sorbet|konfit|marmelade|ketchup|chips|pommes|likör|(^|\s)wein|bier|shot|kaugummi|zältli|weissmehl/i;
+const plantRecCache=new Map();
+function plantText(e){
+  const n=String(e.n||"");if(plantRecCache.has(n))return plantRecCache.get(n);
+  let t=n;const r=allRecipes().find(x=>x&&x.n&&n.startsWith(x.n));
+  if(r)t+=" | "+(r.ing||[]).map(i=>i[0]).join(" | ")+" | "+(typeof r.spices==="string"?r.spices:"");
+  plantRecCache.set(n,t);return t;
+}
+function plantsOf(e){
+  const n=String(e.n||"");if(PLANT_SKIP.test(n))return [];
+  const t=plantText(e).toLowerCase();
+  return PLANTS.filter(p=>p.re.test(t));
+}
+function weekStart(k){const d=parseKey(k),wd=(d.getDay()+6)%7;return shift(k,-wd)}
+function weekPlants(k){
+  const ws=weekStart(k),tk=todayKey(),found=new Map();
+  for(let i=0;i<7;i++){const dk=shift(ws,i);if(dk>tk)break;const d=state.days[dk];if(!d||!d.meals)continue;
+    Object.values(d.meals).forEach(L=>(L||[]).forEach(e=>plantsOf(e).forEach(p=>{if(!found.has(p.n))found.set(p.n,p)})))}
+  const list=[...found.values()];
+  return {ws,list,score:list.reduce((a,p)=>a+p.w,0)};
+}
+function fmtQ(x){const w=Math.floor(x),f=Math.round((x-w)*4);return (w||!f?String(w):"")+(f===1?"¼":f===2?"½":f===3?"¾":"")}
+function plantsCardHTML(){
+  const tk=todayKey(),W=weekPlants(tk),L=weekPlants(shift(W.ws,-1)),sc=W.score,pct=Math.min(100,sc/30*100);
+  const mo=parseKey(tk).getMonth()+1,seas=(SEASON_VEG[mo]||"").split(/,\s*/).filter(Boolean);
+  const eaten=new Set(W.list.map(p=>p.n));
+  const tryList=seas.map(s=>{const p=PLANTS.find(x=>x.re.test(s));return p&&!eaten.has(p.n)?{s,p}:null}).filter(Boolean).slice(0,8);
+  const msg=sc>=30?"🎉 Ziel erreicht! Deine Darmbakterien feiern mit.":sc>=20?"Stark! Noch ein paar neue Sorten bis 30.":sc>=10?"Guter Start. Jede neue Sorte zählt, auch Kräuter und Nüsse.":"Jede Pflanzensorte zählt einmal pro Woche. Tipp: Ein Gemüse-Mix oder Nüsse bringen schnell mehrere Punkte.";
+  const groups=Object.keys(PLANT_GRP).map(g=>[g,W.list.filter(p=>p.g===g)]).filter(x=>x[1].length);
+  const wsD=parseKey(W.ws);
+  return `<section class="card"><div class="sec"><h2 class="disp">🌱 30 Pflanzen</h2><small class="hint">Woche ab ${wsD.toLocaleDateString("de-CH",{weekday:"short",day:"numeric",month:"short"})}</small></div>
+  <div class="p30"><div class="p30n"><b class="num">${fmtQ(sc)}</b><span>/ 30</span></div><div class="p30bar"><i style="width:${pct}%"></i></div></div>
+  <p class="hint" style="margin:8px 0 0">${msg}${L.score?` <span class="num">Letzte Woche: ${fmtQ(L.score)}</span>`:""}</p>
+  ${groups.length?`<div class="p30g">${groups.map(([g,ps])=>`<div><small>${PLANT_GRP[g][0]} ${PLANT_GRP[g][1]}${g==="w"?" (je ¼)":""}</small><div class="p30c">${ps.map(p=>`<span>${p.ic} ${esc(p.n)}</span>`).join("")}</div></div>`).join("")}</div>`:""}
+  ${tryList.length?`<details class="why"><summary>Noch probieren: Saison im ${MONTHS_DE[mo-1]}</summary><div class="p30c" style="margin-top:8px">${tryList.map(x=>`<span class="try">${x.p.ic} ${esc(x.s)}</span>`).join("")}</div></details>`:""}
+  <details class="why"><summary>Warum 30 Pflanzen?</summary><p>Im American Gut Project (über 10'000 Teilnehmende, 2018) hatten Leute, die pro Woche 30 oder mehr verschiedene Pflanzen assen, eine vielfältigere Darmflora als Leute mit 10 oder weniger. Das ist eine Beobachtungsstudie und kein Beweis für Ursache und Wirkung. Aber mehr Vielfalt heisst automatisch mehr Ballaststoffe, Vitamine und sekundäre Pflanzenstoffe, und das macht satt.</p><p>So zählt Plumergy: jede Sorte einmal pro Woche. Gemüse, Früchte, Hülsenfrüchte, Vollkorn, Nüsse und Samen geben 1 Punkt, Kräuter und Gewürze je ¼. Weissmehl, weisser Reis, Säfte und Süssigkeiten zählen nicht. Erkannt wird über die Namen deiner Einträge und die Zutaten der Plumergy-Rezepte. Ein Produkt mit wenig Frucht drin (z.B. Erdbeer-Joghurt) kann mitzählen, das ist eine Schätzung.</p></details>
+  </section>`;
+}
+const MONTHS_DE=["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
+
+/* ---- Take-away-Kompass ---- */
+// [BLV-ID, Portion g, Portion-Text, Tipp]  Nährwerte: Schweizer Nährwertdatenbank (BLV). Portionen sind Richtwerte.
+const TAKE_CATS=[["imbiss","🥙","Imbiss"],["burger","🍔","Burger"],["pizza","🍕","Pizza"],["asia","🍜","Asiatisch"],["beck","🥪","Unterwegs"],["beiz","🇨🇭","Beiz & Mensa"]];
+const TAKEAWAY={
+ imbiss:[["g1572",400,"1 Kebab","Als Kebab-Teller mit viel Salat und ohne Pommes bestellen, Joghurt- statt Cocktailsauce. Ein Dürüm hat meist mehr Brot."],["g14066",150,"ca. 5 Stück","Frittiert, darum dicht an Kalorien. Im Pita mit viel Salat und Hummus, dazu ein Ayran für mehr Eiweiss."],["g10561",120,"2 Stück","Gebacken hat weniger Fett als frittiert. Mit einem Raita oder Linsen-Dal wird eine Mahlzeit daraus."],["g10562",120,"2 Stück","Frittiert: lieber die gebackene Variante oder nur eine Samosa als Vorspeise."],["g1590",150,"1 Stück","Ein Hot Dog geht. Senf statt Mayo, und lieber nicht zwei."],["g14221",110,"1 Stück","Typischer Bahnhof-Snack mit viel Fett. Mit einem Joghurt oder Apfel dazu hält es länger."],["g1686",250,"1 Stück","Panade und Sauce bringen viel Fett. Mit wenig Sauce bestellen."]],
+ burger:[["g14024",120,"1 Burger (klein)","Ein einfacher Burger passt oft ins Budget. Salat statt Pommes und Wasser oder Zero dazu."],["g13460",200,"1 Burger","Gegrilltes statt paniertes Poulet wählen, wenn es geht."],["g13461",150,"1 Burger","Paniert und mit Sauce: eher selten. Lieber ein Burger mit gegrilltem Poulet."],["g14025",220,"1 Burger","Doppelt heisst doppelt Fleisch und Käse. Ein einfacher Burger und ein Salat sättigen auch."],["g10449",115,"mittlere Portion","Kleine Portion nehmen oder teilen. Salat als Beilage spart viel."]],
+ pizza:[["g1540",380,"1 ganze Pizza","Die leichteste Pizza: viel Gemüse, viel Volumen. Mit Thon oder Poulet obendrauf gibt es mehr Eiweiss."],["g1534",380,"1 ganze Pizza","Halbe Pizza und ein grosser Salat dazu, den Rest morgen essen."],["g1537",380,"1 ganze Pizza","Schinken bringt etwas Eiweiss. Halbe Pizza mit Salat ist die smarte Wahl."],["g1535",380,"1 ganze Pizza","Klassiker. Teilen oder mit einem grossen Salat kombinieren."],["g1532",380,"1 ganze Pizza","Thon bringt Eiweiss. Mit Salat dazu bist du lange satt."],["g1533",380,"1 ganze Pizza","Gefüllt und dicht: eher halbe Portion."],["g1536",380,"1 ganze Pizza","Mascarpone ist sehr fettreich. Lieber Prosciutto e Funghi."],["g1539",380,"1 ganze Pizza","Viel Käse, viel Fett. Lieber Margherita oder Prosciutto."],["g1504",300,"1 Flammkuchen","Dünner Boden, aber Crème fraîche und Speck. Teilen und Salat dazu."]],
+ asia:[["g1579",400,"1 Teller","Mit extra Gemüse und Poulet bestellen, ein Spiegelei obendrauf bringt Eiweiss."],["g1577",400,"1 Teller","Nudeln mit Gemüse und Poulet oder Crevetten, Sauce sparsam."],["g1675",400,"1 Teller","Schweizer Curry-Klassiker. Mehr Poulet, weniger Reis bestellen, wenn es geht."],["g14061",100,"2 Stück","Als Vorspeise ok. Als Hauptgang lieber eine Suppe oder ein Wok mit Gemüse."]],
+ beck:[["g1557",180,"1 Sandwich","Schinken ist mager. Mit Ruchbrot statt Baguette bist du länger satt."],["g1554",170,"1 Sandwich","Trockenfleisch ist eiweissreich und mager, eine der besten Sandwich-Wahlen."],["g1561",180,"1 Sandwich","Mozzarella bringt Fett. Dazu ein Skyr oder Proteinshake für mehr Eiweiss."],["g1198",250,"1 Becher","Ungezuckert eine gute Wahl. Fertig-Bircher aus dem Regal ist oft gesüsst."],["g14056",150,"1 Stück","Warm und sättigend. Mit Salat statt mit Pommes."],["g10406",45,"1 Gipfeli","Viel Butter, wenig Eiweiss. Lieber ein Laugenbrötli mit Schinken."],["g835",70,"1 Laugengipfeli","Fettreich. Ein Laugenbrötli ist leichter."],["g832",70,"1 Brötli","Wenig Fett. Mit Schinken oder Käse wird ein Snack daraus."],["g1541",150,"1 Stück","Speck und Rahm: eher selten und klein."],["g1543",150,"1 Stück","Käsewähe ist fettreich. Gemüse- oder Spinatwähe ist leichter."],["g1566",150,"1 Stück","Leichter als Käsewähe. Mit Salat dazu eine ganze Mahlzeit."]],
+ beiz:[["g1648",400,"1 Teller","Bohnen und Fleisch: viel Eiweiss und Ballaststoffe. Mit Reis oder Brot massvoll."],["g1582",200,"1 Portion","Mageres Hack wird viel Eiweiss. Mit Gemüse statt Kartoffelstock."],["g14183",130,"1 Bratwurst","Grillstand-Klassiker (z.B. OLMA, Sechseläuten). Senf statt Mayo, ein Bürli dazu reicht."],["g1081",100,"1 Cervelat","Die Nationalwurst. Gut für Eiweiss, aber viel Fett und Salz."],["g1664",350,"1 Portion","Mit einem grossen Salat dazu reicht eine Portion."],["g1666",350,"1 Portion","Mehr Gemüse, aber oft viel Käse und Béchamel."],["g1585",350,"1 Teller","Wenig Eiweiss. Mit Poulet oder Crevetten ergänzen."],["g1478",400,"1 Teller","Käse, Rahm und Teigwaren: ein schwerer Klassiker. Kleine Portion und Apfelmus dazu."],["g1475",250,"1 Portion (ohne Brot)","Das Brot kommt noch dazu. Gemüse und Kartoffeln zum Dippen sind leichter. Weisswein oder Tee dazu."],["g1568",250,"1 Portion","Viel Fett. Als kleine Vorspeise statt Hauptgang."],["g1609",200,"1 Portion","Bulgur, Gemüse und Kräuter. Mit Poulet oder Feta wird es eine Mahlzeit."],["g1517",200,"1 Portion","Mit Essig-Öl leichter als mit Mayonnaise."],["g684",350,"1 Teller","Wärmt und ist recht leicht. Gutes Mittagessen mit Brot."],["g671",350,"1 Teller","Viel Gemüse, wenig Kalorien. Mit Brot und Käse eine Mahlzeit."],["g670",300,"1 Teller","Sehr leicht. Als Vorspeise ideal."]]
+};
+function takeItem(x){const f=SNDB.find(s=>s.id===x[0]);if(!f)return null;const g=x[1];return {f,g,lbl:x[2],tip:x[3],k:f.k*g/100,p:f.p*g/100,c:f.c*g/100,fa:f.f*g/100}}
+function takeName(n){return n.replace(/, (zubereitet|hausgemacht).*$/,"").replace(/^((Pizza|Flammkuchen).*), gebacken$/,"$1").replace(/ \(mit jodiertem Kochsalz\)/,"").replace(/, gebraten \(ohne Zusatz von Fett und Salz\)/," gebraten").replace(/ \(in HO Sonnenblumenöl frittiert\), ungesalzen/,"").replace(/ \(in HOLL Rapsöl frittiert\)/,"")}
+function openTake(meal,cat){sheet={kind:"take",cat:cat||"imbiss",meal:meal||defaultMeal()};document.body.style.overflow="hidden";renderTake()}
+function renderTake(){
+  if(!sheet||sheet.kind!=="take")return;
+  const items=(TAKEAWAY[sheet.cat]||[]).map(takeItem).filter(Boolean).sort((a,b)=>a.k-b.k);
+  const tk=todayKey(),g=goalsFor(tk),t=dayTotals(tk),R=g.kcal-t.k;
+  const root=document.getElementById("sheetRoot");
+  root.innerHTML=`<div class="backdrop" id="bd"></div><div class="sheet ${sheet._shown?"":"anim"}" role="dialog" aria-modal="true"><div class="sheet-h"><div class="grab"></div><div class="sheet-t"><h3>Take-away-Kompass</h3><button class="btn ghost" style="height:36px" id="closeS" type="button">Fertig</button></div></div>
+  <div class="sheet-b" id="sb">
+    <p class="hint num" style="margin:0">${R>0?`Du hast heute noch <b style="color:var(--ink)">${r0(R)} kcal</b> frei.`:`Dein Tagesbudget ist heute aufgebraucht.`} Sortiert von leicht nach schwer.</p>
+    <div class="cvtabs">${TAKE_CATS.map(([k,i,l])=>`<button type="button" class="cvtab ${sheet.cat===k?"on":""}" data-tkc="${k}"><span>${i}</span>${l}</button>`).join("")}</div>
+    ${items.map((i,ix)=>{const fits=i.k<=Math.max(R,0)+20,pp=i.k>0?i.p*4/i.k:0;return `<div class="cvitem ${fits?"":"over"}"><b>${esc(takeName(i.f.n))} <span class="brand">🇨🇭</span></b><span class="cm">${esc(i.lbl)} · ca. ${r0(i.g)} g</span><span class="cn num"><span>${r0(i.k)} kcal</span><span style="color:var(--pro)">${r0(i.p)} g Eiweiss</span><span style="color:var(--fat)">${r0(i.fa)} g Fett</span>${pp>=0.2?`<span style="color:#6EF0B0">💪</span>`:""}</span><span class="cm tktip">💡 ${esc(i.tip)}</span><button type="button" data-tkadd="${ix}">Eintragen</button></div>`}).join("")}
+    <p class="hint" style="margin:4px 0 0;font-size:12px">Nährwerte: Schweizer Nährwertdatenbank (BLV), Durchschnittswerte. Die Portionsgrössen sind Richtwerte, du kannst die Gramm beim Eintragen anpassen. 💪 = mindestens 20 % der Kalorien aus Eiweiss.</p>
+  </div></div>`;
+  sheet._shown=true;sheet._items=items;
+  const $=id=>document.getElementById(id);
+  $("closeS").onclick=closeSheet;$("bd").onclick=closeSheet;
+  root.querySelectorAll("[data-tkc]").forEach(b=>b.onclick=()=>{sheet.cat=b.dataset.tkc;renderTake();const sb=$("sb");if(sb)sb.scrollTop=0});
+  root.querySelectorAll("[data-tkadd]").forEach(b=>b.onclick=()=>{
+    const i=sheet._items[+b.dataset.tkadd];if(!i)return;const m=sheet.meal;
+    openAdd(m);sheet.food={n:i.f.n,k:i.f.k,p:i.f.p,c:i.f.c,f:i.f.f,pg:i.g,pl:/^1 /.test(i.lbl)?i.lbl.slice(2):"Portion",bc:i.f.bc};sheet.grams=i.g;sheet.step="detail";renderSheet();
+  });
+}
+
 /* ---- Kalender ---- */
 let calOff=0;
 function dayStatus(k){const t=dayTotals(k);if(!t.n)return "";if(t.n<2)return "part";const g=goalsFor(k);return t.k>g.kcal*1.1?"over":t.k<g.kcal*0.85?"under":"ok"}
@@ -3897,9 +4068,12 @@ const EX_HOW={
 const WARMUP="5 Minuten locker bewegen (Velo, Laufband, Treppe oder Hampelmann). Dann Armkreisen, Hüftkreisen und 10 Kniebeugen ohne Gewicht. Bei der ersten Übung 1–2 leichte Sätze mit etwa der Hälfte des Gewichts.";
 
 /* ---- Neu in Plumergy ---- */
-const APP_VER="2026-10-15";
+const APP_VER="2026-10-18";
 /* NEWS: [Version, Emoji, Titel, Text] – neuste zuerst. Gezeigt wird alles, was neuer ist als die zuletzt gesehene Version. */
 const NEWS=[
+ ["2026-10-18","💊","Supplement-Tracker","Hake bei «Heute» deine Supplemente mit einem Tipp ab, mit Streak, Erinnerung und einer Info zu Vitamin D im Schweizer Winter."],
+ ["2026-10-18","🌱","30 Pflanzen pro Woche","Unter Fortschritt zählt Plumergy, wie viele verschiedene Pflanzen du diese Woche gegessen hast, und zeigt, was in der Saison noch fehlt."],
+ ["2026-10-18","🥙","Take-away-Kompass","Kebab, Pizza, Burger, Nasi Goreng & Co. mit offiziellen Schweizer Nährwerten und einem Tipp für die bessere Wahl. Unter Kochen oder beim Erfassen."],
  ["2026-10-15","🍽️","Portionen wählen","Bei jedem Rezept stellst du mit − und + ein, für wie viele Portionen du kochst. Alle Zutaten und Gewürzmengen rechnen sich automatisch um."],
  ["2026-10-14b","🌯","Honig-Chipotle-Poulet-Quesadillas","Meal Prep für 10 Stück: knusprige Quesadillas mit zerzupftem Poulet, Chipotle-Gewürz von Coop und Honig, 449 kcal und 60 g Eiweiss pro Stück. Halten 3 Monate im Tiefkühler."],
  ["2026-10-14","💪","High Protein, wenig Kalorien","Unter Kochen zeigt Plumergy beim Ziel Abnehmen jetzt Rezepte mit mindestens 30 % Eiweiss und höchstens 450 kcal pro Portion."],
@@ -4041,6 +4215,7 @@ document.getElementById("app").addEventListener("click",e=>{
   const md=e.target.closest("[data-mood]");if(md){setMood(md.dataset.mood,+md.dataset.v);return}
   const phb=e.target.closest("[data-photo]");if(phb){openViewer(phb.dataset.photo);return}
   const cp=e.target.closest("[data-copy]");if(cp){copyMeal(cp.dataset.copy,cp.dataset.from);return}
+  const sp=e.target.closest("[data-supp]");if(sp){suppToggle(sp.dataset.supp);return}
   const t=e.target.closest("[data-go],[data-guide],[data-recgo],[data-badge],[data-act]");if(!t)return;
   if(t.dataset.go){go(t.dataset.go);return}
   if(t.dataset.guide){openGuide(t.dataset.guide);if(t.dataset.gcat){sheet.rcat=t.dataset.gcat;renderSheet()}return}
@@ -4056,6 +4231,9 @@ document.getElementById("app").addEventListener("click",e=>{
   if(a==="coach"){openCoach(null);return}
   if(a==="eatcheck"){openCheck();return}
   if(a==="crave"){openCrave();return}
+  if(a==="take"){openTake();return}
+  if(a==="suppedit"){openSupp();return}
+  if(a==="suppall"){suppTakeAll();return}
   if(a==="checkin"){openCheckin();return}
   if(a==="backup"){doBackup();return}
   if(a==="bklater"){state.settings.bkSnooze=todayKey();persist("settings");render();return}
