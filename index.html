@@ -1556,6 +1556,34 @@ function verdictOf(){
 }
 function verdictHTML(){const r=verdictOf();if(!r)return "";return `<div class="vi2">${r.ic}</div><div><b>${esc(r.ti)}</b><span>${esc(r.tx)}</span>${r.fit>=10?`<div style="margin-top:8px"><button type="button" class="fitbtn" data-fit="${r.fit}">Portion auf ${r.fit} anpassen</button></div>`:""}</div>`}
 function openCheck(){openAdd(defaultMeal(),"scan");sheet.check=true;sheet.autoMeal=true;renderSheet()}
+/* ---- Roh oder gekocht gewogen ---- */
+const COOKED_RE=/gekocht|gebraten|gegart|gedämpft|gegrillt|zubereitet|im ofen|gebacken|gewogen\)/i;
+function cookInfo(f){if(!f||!f.n||f.ai)return null;const n=String(f.n).toLowerCase();if(/\((abnehm|aufbau)-portion\)/.test(n))return null;
+  let t=null;
+  if(/\breis\b|basmati|jasmin|risottoreis|vollkornreis/.test(n)&&!/reiswaffel|reisdrink|reismehl|milchreis|reisnudel/.test(n))t=/vollkorn|unpoliert|brauner|naturreis/.test(n)?["Reis (Vollkorn)",2.6,"trocken"]:/parboiled/.test(n)?["Reis (parboiled)",2.9,"trocken"]:["Reis",3.0,"trocken"];
+  else if(/teigwaren|spaghetti|penne|hörnli|fusilli|nudel|makkaroni|maccheroni|farfalle|tagliatelle|linguine|rigatoni|pasta|spätzli/.test(n)&&!/gefüllt|tortellini|ravioli|fertig|sauce|gnocchi|frisch/.test(n))t=["Teigwaren",2.2,"trocken"];
+  else if(/quinoa/.test(n))t=["Quinoa",3.1,"trocken"];
+  else if(/couscous/.test(n))t=["Couscous",2.3,"trocken"];
+  else if(/bulgur|rollgerste|gerste\b/.test(n))t=[/bulgur/.test(n)?"Bulgur":"Gerste",2.5,"trocken"];
+  else if(/linse/.test(n)&&!/suppe|dal\b|dose|abgetropft|konserve|spaghetti|pasta/.test(n))t=/rot|geschält|gelb/.test(n)?["Rote Linsen",2.5,"trocken"]:["Linsen",2.8,"trocken"];
+  else if(/kichererbse/.test(n)&&!/abgetropft|dose|konserve|hummus/.test(n))t=["Kichererbsen",2.6,"trocken"];
+  else if(/bohne/.test(n)&&/getrocknet|trocken/.test(n))t=["Bohnen",2.7,"trocken"];
+  else if(/poulet|huhn|hähnchen|chicken|truten|trute|pute/.test(n)&&!/wurst|aufschnitt|nugget|gepökelt|schinken|geräuchert|aufstrich|salat|burger|bouillon|curry/.test(n))t=["Poulet/Trute",0.84,"roh"];
+  else if(/\brind|entrecôte|entrecote|steak|rindsfilet|rindsgeschnetzeltes/.test(n)&&!/hack|gehackt|wurst|trocken|bündner|burger/.test(n))t=["Rind",0.83,"roh"];
+  else if(/schwein|kotelett|plätzli|schweinsfilet/.test(n)&&!/hack|gehackt|wurst|schinken|speck/.test(n))t=["Schwein",0.77,"roh"];
+  if(!t)return null;
+  return {lbl:t[0],fac:t[1],rawW:t[2],base:COOKED_RE.test(n)?"cooked":"raw"}}
+function cookToggleHTML(){const base=sheet.cookOrig||sheet.food,ci=cookInfo(base);if(!ci)return "";const st=sheet.cookOrig?(ci.base==="raw"?"cooked":"raw"):ci.base;
+  const rawL=ci.rawW==="trocken"?"Trocken / roh":"Roh",ckL=ci.fac>1?"Gekocht":"Gebraten / gekocht";
+  const ex=ci.fac>1?`100 g ${ci.lbl} ${ci.rawW} ≈ ${Math.round(100*ci.fac)} g gekocht`:`100 g ${ci.lbl} roh ≈ ${Math.round(100*ci.fac)} g gebraten (verliert Wasser)`;
+  return `<div class="ciq" style="margin:2px 0 0"><span class="ml">Wie hast du gewogen?</span><div class="seg" id="cookSeg"><button type="button" data-ck="raw" class="${st==="raw"?"on":""}">${rawL}</button><button type="button" data-ck="cooked" class="${st==="cooked"?"on":""}">${ckL}</button></div>
+  <p class="hint" style="margin:4px 0 0">Die Nährwerte gelten für <b style="color:var(--ink)">${ci.base==="raw"?(ci.rawW==="trocken"?"trocken/roh":"roh"):"gekocht"}</b>. Faustregel: ${ex}.${sheet.cookOrig?` Plumergy rechnet deine ${st==="cooked"?"gekochten":"rohen"} Gramm automatisch um.`:""} <button type="button" id="cookWhy" style="background:none;border:0;color:var(--accent);font:inherit;padding:0;text-decoration:underline">Warum ist das wichtig?</button></p>
+  ${sheet.cookWhy?`<div class="gcard" style="margin-top:6px"><b>Roh oder gekocht?</b><p style="margin:4px 0 0">Nährwerte auf Packungen gelten fast immer für das <b>rohe bzw. trockene</b> Produkt. Beim Kochen nehmen Reis, Pasta und Hülsenfrüchte Wasser auf und werden schwerer, Fleisch verliert Wasser und wird leichter. Die Kalorien bleiben gleich, nur das Gewicht ändert sich.</p><p style="margin:6px 0 0">Faustregeln aus der Schweizer Nährwertdatenbank (BLV), gekocht = roh ×: Reis 3 (Vollkornreis 2.6), Quinoa 3.1, Teigwaren 2.2, Couscous 2.3, Linsen 2.5–2.8, Kichererbsen 2.6, Poulet 0.84, Rind 0.83, Schwein 0.77. Bei Hackfleisch und Fisch ändert sich der Kaloriengehalt pro Gramm kaum.</p><p class="hint" style="margin:6px 0 0">Am genauesten: roh oder trocken wiegen. Für Meal Prep: alles gekocht wiegen, durch die Anzahl Portionen teilen und hier „Gekocht“ wählen.</p></div>`:""}</div>`}
+function cookSwitch(to){const base=sheet.cookOrig||sheet.food,ci=cookInfo(base);if(!ci)return;const cur=sheet.cookOrig?(ci.base==="raw"?"cooked":"raw"):ci.base;if(to===cur)return;
+  if(to===ci.base){sheet.grams=r0(ci.base==="raw"?sheet.grams/ci.fac:sheet.grams*ci.fac);sheet.food=base;sheet.cookOrig=null;return}
+  const m=ci.base==="raw"?1/ci.fac:ci.fac;const nm=String(base.n).replace(/\s*\((roh|gekocht) gewogen\)$/,"").replace(to==="cooked"?/,?\s*\b(trocken|roh|ungekocht)\b/gi:/,?\s*\b(gekocht|gebraten|gegart|gedämpft)\b[^,]*/gi,"").trim()+(to==="cooked"?" (gekocht gewogen)":" (roh gewogen)");
+  sheet.cookOrig=base;sheet.food={...base,n:nm,k:r1(base.k*m),p:r1(base.p*m),c:r1(base.c*m),f:r1(base.f*m),pg:null,pl:null};
+  sheet.grams=r0(ci.base==="raw"?sheet.grams*ci.fac:sheet.grams/ci.fac)}
 function previewHTML(){
   const f=sheet.food,g=+sheet.grams||0,x=g/100;
   return `<div><b class="num">${r0(f.k*x)}</b><span>kcal</span></div><div><b class="num" style="color:var(--pro)">${r1(f.p*x)}</b><span>Eiweiss</span></div><div><b class="num" style="color:var(--carb)">${r1(f.c*x)}</b><span>Kohlenh.</span></div><div><b class="num" style="color:var(--fat)">${r1(f.f*x)}</b><span>Fett</span></div>`;
@@ -1649,6 +1677,7 @@ function renderSheet(){
   }
   else if(sheet.kind==="settings"){ head=`<div class="sheet-t"><h3>Tagesziele</h3><button class="btn ghost" style="height:36px" id="closeS" type="button">Schliessen</button></div>`; body=settingsHTML(); }
   else if(sheet.step==="detail"){
+    if(sheet.cookOrig&&sheet._ckF!==sheet.food)sheet.cookOrig=null;
     const f=sheet.food;
     if(sheet.replace&&sheet.kind==="add"&&sheet._rpSet!==f){sheet._rpSet=f;sheet.grams=sheet.replace.g}
     const drink=isDrink(f,sheet.meal);
@@ -1661,6 +1690,7 @@ function renderSheet(){
     body=`<div><h3 style="margin:0;font-family:var(--display);font-size:20px">${esc(f.n)}</h3><div class="hint num">${r0(f.k)} kcal · E ${r1(f.p)} g · K ${r1(f.c)} g · F ${r1(f.f)} g pro 100 ${U}</div></div>
     <div class="field"><label for="gramsInp">${drink?"Menge in ml":"Menge in Gramm"}</label><input class="inp num" id="gramsInp" type="number" inputmode="decimal" min="0" step="1" value="${r0(sheet.grams)}"></div>
     <div class="chips" id="gChips">${chips.map(([v,l])=>`<button type="button" class="chip ${+sheet.grams===v?"on":""}" data-g="${v}">${esc(l)}</button>`).join("")}</div>
+    ${drink?"":cookToggleHTML()}
     ${sheet.check?`<div class="verdict v-${(verdictOf()||{}).v}" id="verdict">${verdictHTML()}</div>`:""}
     <div class="preview" id="prev">${previewHTML()}</div>
     ${sheet.check?`<details class="whyeat"><summary>Warum?</summary><div class="fchk" id="fcheck">${checkHTML()}</div></details>`:`<div class="fchk" id="fcheck">${checkHTML()}</div>`}
@@ -2010,6 +2040,8 @@ function bindSheet(){
 
   if(sheet.step==="detail"){
     const gi=$("gramsInp");
+    const cks=$("cookSeg");if(cks)cks.onclick=e=>{const b=e.target.closest("[data-ck]");if(!b)return;sheet.grams=parseFloat(String(gi.value).replace(",","."))||sheet.grams;cookSwitch(b.dataset.ck);sheet._ckF=sheet.food;const y=$("sb")?$("sb").scrollTop:0;renderSheet();if($("sb"))$("sb").scrollTop=y};
+    const ckw=$("cookWhy");if(ckw)ckw.onclick=()=>{sheet.cookWhy=!sheet.cookWhy;const y=$("sb")?$("sb").scrollTop:0;renderSheet();if($("sb"))$("sb").scrollTop=y};
     const upd=()=>{$("prev").innerHTML=previewHTML();const fc=$("fcheck");if(fc)fc.innerHTML=checkHTML();const vd=$("verdict");if(vd){const r=verdictOf();vd.className="verdict v-"+r.v;vd.innerHTML=verdictHTML()}document.querySelectorAll("#gChips .chip").forEach(c=>c.classList.toggle("on",+c.dataset.g===+sheet.grams))};
     gi.oninput=()=>{sheet.grams=parseFloat(gi.value.replace(",","."))||0;upd()};
     gi.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();gi.blur();$("saveBtn").click()}};
@@ -2601,7 +2633,7 @@ function recipeDetailHTML(r){
   <button class="btn ghost" type="button" data-planadd="${esc(r.id)}" ${planOf().items.some(x=>x.id===r.id)?"disabled":""}>${planOf().items.some(x=>x.id===r.id)?"✓ Im Wochenplan":"🛒 Zum Wochenplan"}</button>
   <div class="gcard"><div style="display:flex;align-items:center;justify-content:space-between;gap:10px"><b>Zutaten für ${np} Portion${np===1?"":"en"}</b><div class="npstep" id="recNp" style="display:flex;align-items:center;gap:6px"><button type="button" class="chip" data-np="-1" aria-label="Eine Portion weniger" ${np<=1?"disabled":""} style="min-width:40px;min-height:40px;font-size:20px">−</button><b class="num" style="min-width:26px;text-align:center;font-size:18px">${np}</b><button type="button" class="chip" data-np="1" aria-label="Eine Portion mehr" ${np>=30?"disabled":""} style="min-width:40px;min-height:40px;font-size:20px">+</button></div></div>
   ${fac!==1?`<p class="hint" style="margin:4px 0 0">Umgerechnet vom Grundrezept für ${r.portions} Portionen. <button type="button" class="linkbtn" data-np="0" style="background:none;border:0;color:var(--accent);font:inherit;padding:0;text-decoration:underline">Zurücksetzen</button></p>`:""}
-  <ul class="ilist">${r.ing.map(([n,b,g])=>`<li><span>${esc(n)} <span class="brand">${esc(b)}</span></span><span class="num">${recAmt(g*fac)} g</span></li>`).join("")}</ul>${r.spices&&r.spices!=="—"?`<p class="hint" style="margin:6px 0 0">Dazu: ${esc(scaleTxt(r.spices,fac))}.${fac!==1?" Gewürze am Schluss nach Geschmack abschmecken.":""}</p>`:""}
+  <ul class="ilist">${r.ing.map(([n,b,g])=>`<li><span>${esc(n)} <span class="brand">${esc(b)}</span></span><span class="num">${recAmt(g*fac)} g</span></li>`).join("")}</ul><p class="hint" style="margin:4px 0 0">Alle Mengen roh bzw. ungekocht gewogen (Reis, Pasta, Linsen trocken).</p>${r.spices&&r.spices!=="—"?`<p class="hint" style="margin:6px 0 0">Dazu: ${esc(scaleTxt(r.spices,fac))}.${fac!==1?" Gewürze am Schluss nach Geschmack abschmecken.":""}</p>`:""}
   ${m==="bulk"&&r.extra.length?`<p style="margin:8px 0 0"><b style="color:var(--carb)">Aufbau-Extra für ${np} Portion${np===1?"":"en"}:</b> ${r.extra.map(([n,g])=>`+${recAmt(g*np)} g ${esc(n)}`).join(", ")}</p>`:""}</div>
   ${swapHTML(r)}
   <div class="gcard"><b>Zubereitung</b><ol class="gsteps">${r.steps.map(x=>`<li>${esc(x)}</li>`).join("")}</ol></div>
@@ -4280,9 +4312,10 @@ const EX_HOW={
 const WARMUP="5 Minuten locker bewegen (Velo, Laufband, Treppe oder Hampelmann). Dann Armkreisen, Hüftkreisen und 10 Kniebeugen ohne Gewicht. Bei der ersten Übung 1–2 leichte Sätze mit etwa der Hälfte des Gewichts.";
 
 /* ---- Neu in Plumergy ---- */
-const APP_VER="2026-10-19b";
+const APP_VER="2026-10-19c";
 /* NEWS: [Version, Emoji, Titel, Text] – neuste zuerst. Gezeigt wird alles, was neuer ist als die zuletzt gesehene Version. */
 const NEWS=[
+ ["2026-10-19c","🍚","Roh oder gekocht gewogen?","Bei Reis, Pasta, Quinoa, Linsen, Poulet, Rind und Schwein wählst du beim Eintragen, ob du roh oder gekocht gewogen hast. Plumergy rechnet automatisch um, z.B. 100 g Reis trocken ≈ 300 g gekocht."],
  ["2026-10-19b","⚖️","Check-in: nüchtern oder gegessen?","Der Check-in fragt jetzt, ob du schon gegessen hast. Messungen nach dem Essen zählen nicht für deinen Trend, weil man dann oft 1–2 kg mehr wiegt."],
  ["2026-10-19b","🥗","Ernährungs-Check","Jede Woche zeigt dir Plumergy, wie du gegessen hast: Süssgetränke, Süsses, Gemüse, Eiweiss, Fast Food, Alkohol und mehr, nach den Schweizer Ernährungsempfehlungen. Ohne Zwang, mit Tipps und einem freiwilligen Fokus für die nächste Woche."],
  ["2026-10-19b","🌱","Diäten für alle","Neu wählbar: Flexitarisch, Pescetarisch, DASH und Keto. Rezepte unter Kochen passen sich deiner Ernährung an, und bei Rezepten mit Fleisch zeigt Plumergy vegane und vegetarische Tausch-Tipps."],
