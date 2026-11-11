@@ -51,6 +51,14 @@ h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance}
 .b-add{background:linear-gradient(120deg,#FFC93C,#FF8A4C 55%,#FF5E8A)}
 .b-ov{background:linear-gradient(120deg,#12B5A6,#2B8CF0 60%,#7B5CFF)}
 @keyframes bobx{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+.mustbox{margin:0 0 14px;padding:12px 14px;border-radius:16px;background:linear-gradient(135deg,#FFF6E0,#FFE9F0);border:1px solid #F6D9B8}
+.mustbox h4{margin:0;font-size:16px}
+.mustbox .trow{border-bottom:1px solid rgba(0,0,0,.06)}
+.today{padding:6px 16px}.today .tdh{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 0 4px}
+.demo{margin:0 0 12px;padding:10px 14px;border-radius:12px;background:#FFF3C4;color:#7A5A00;font-weight:700;font-size:13.5px}
+.fxr{margin-top:10px;display:grid;gap:6px}.fxr div{display:flex;justify-content:space-between;background:var(--soft);border-radius:12px;padding:9px 12px;font-weight:700}
+.fxrow{display:grid;grid-template-columns:1fr 110px;gap:8px;margin-top:6px}
+
 .wx{margin-top:12px;background:rgba(255,255,255,.16);border-radius:14px;padding:11px 13px;color:#fff}
 .wx .wn{display:flex;align-items:baseline;gap:10px}.wx .wn strong{font-size:30px;line-height:1}.wx .wn span{font-weight:700}
 .wx .wr{font-size:13px;opacity:.95;margin-top:3px}
@@ -373,6 +381,12 @@ textarea.in-c{min-height:74px;resize:vertical}
         <button class="btn" type="submit" style="flex:none;padding:0 16px" aria-label="Punkt hinzufügen">Neu</button>
       </form>
     </div>
+    <div class="panel" id="fxPanel">
+      <h2>Währung</h2>
+      <p class="sub" id="fxInfo">Kurs wird geladen ...</p>
+      <div class="fxrow"><input id="fxAmt" type="number" inputmode="decimal" placeholder="Betrag" value="100"><select id="fxCur"><option value="THB">Baht (THB)</option><option value="MYR">Ringgit (MYR)</option><option value="CHF">Franken (CHF)</option></select></div>
+      <div class="fxr" id="fxOut"></div>
+    </div>
     <div class="panel" id="livePanel">
       <h2>Live-Daten</h2>
       <p class="sub" id="liveInfo">Wetter wird beim Öffnen und alle 10 Minuten direkt abgerufen (Open-Meteo).</p>
@@ -407,6 +421,18 @@ textarea.in-c{min-height:74px;resize:vertical}
 <script>
 (function(){
 'use strict';
+var DEMO=(function(){
+  var o={on:false,now:'',live:''};
+  try{
+    var q=new URLSearchParams(location.search),n=q.get('now'),l=q.get('live');
+    if(n&&/^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2})?$/.test(n)){
+      var t=Date.parse((n.length===10?n+'T12:00':n)+':00+01:00');
+      if(t){var real=Date.now,off=t-real();Date.now=function(){return real()+off;};o.on=true;o.now=n;}
+    }
+    if(l&&/^(ok|delay|cancel|rain)$/.test(l)){o.on=true;o.live=l;}
+  }catch(e){}
+  return o;
+})();
 var $=function(s,r){return (r||document).querySelector(s);};
 var esc=function(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});};
 
@@ -512,6 +538,49 @@ var IDEAS={
  hkt:['Big Buddha','Old Phuket Town','Phi Phi Inseltour','Bangla Road Patong','Promthep Cape Sonnenuntergang','Kata und Karon Strand'],
  bkk:['Grand Palace und Wat Pho','Wat Arun','Chinatown Yaowarat Streetfood','Jim Thompson House','Asiatique Riverfront','Loy Krathong am Fluss']
 };
+var MUST={
+ kl:[
+  {id:'kl1',t:'Mitsui Outlet am Flughafen',n:'Erster Stopp nach der Landung, per Shuttle.',q:'Mitsui Outlet Park KLIA Sepang',top:1},
+  {id:'kl2',t:'Petronas Twin Towers und KLCC Park',n:'Trip.com Bewertung 4,6. Abends beleuchtet.',q:'Petronas Twin Towers',top:1},
+  {id:'kl3',t:'Batu Caves',n:'Bunte Treppe und Cathedral Cave. Früh hingehen, wegen der Hitze.',q:'Batu Caves',top:1},
+  {id:'kl4',t:'Aquaria KLCC',n:'Bewertung 4,5. Gut bei Regen.',q:'Aquaria KLCC',in:1},
+  {id:'kl5',t:'KL Tower (Aussichtsdeck)',n:'Etwa RM 50 bis 100 je nach Paket, täglich 9 bis 22 Uhr.',q:'Menara Kuala Lumpur',in:1},
+  {id:'kl6',t:'Jalan Alor Streetfood',n:'Abends in Bukit Bintang.',q:'Jalan Alor'},
+  {id:'kl7',t:'Sunway Lagoon',n:'Wasser- und Themenpark, Bewertung 4,7. Eigener Tagesausflug.',q:'Sunway Lagoon'}
+ ],
+ lgk:[
+  {id:'lg1',t:'SkyCab und SkyBridge',n:'SkyBridge 4,7, SkyCab 4,5. Täglich ab 9:30 Uhr. Bei klarem Himmel hingehen.',q:'Langkawi SkyCab',top:1},
+  {id:'lg2',t:'Inselhüpfen (3 Inseln) oder Jetski',n:'Pulau Dayang Bunting mit Süsswassersee und Pulau Beras Basah.',q:'Island hopping Langkawi Pantai Cenang',top:1},
+  {id:'lg3',t:'Mangroven-Tour im Kilim Geoforest Park',n:'Etwa 2 Stunden mit dem Boot.',q:'Kilim Karst Geoforest Park',top:1},
+  {id:'lg4',t:'Underwater World Langkawi',n:'Bewertung 4,6, täglich 10 bis 22 Uhr. Gut bei Regen.',q:'Underwater World Langkawi',in:1},
+  {id:'lg5',t:'Nachtmarkt (Pasar Malam)',n:'Streetfood und Handwerk, wechselt nach Wochentag.',q:'Pasar Malam Langkawi'},
+  {id:'lg6',t:'Oriental Village',n:'Bewertung 4,3, Eingang zur SkyCab.',q:'Oriental Village Langkawi'},
+  {id:'lg7',t:'Eagle Square und Sonnenuntergang am Strand',n:'Kostenlos, abends am schönsten.',q:'Dataran Lang Langkawi'}
+ ],
+ hkt:[
+  {id:'hk1',t:'Phi Phi Inseln und Maya Bay',n:'Rund 1,5 Stunden Bootsfahrt. Ganztagesausflug, früh buchen.',q:'Phi Phi Islands tour Phuket',top:1},
+  {id:'hk2',t:'Big Buddha',n:'Im März 2026 nach Umbau wieder eröffnet, Eintritt frei.',q:'Big Buddha Phuket',top:1},
+  {id:'hk3',t:'Phang Nga Bay und James Bond Island',n:'Bootstour in der Bucht.',q:'Phang Nga Bay James Bond Island tour',top:1},
+  {id:'hk4',t:'Wat Chalong',n:'Wichtigster Tempel der Insel. Schultern und Knie bedecken.',q:'Wat Chalong',in:1},
+  {id:'hk5',t:'Bangla Road in Patong',n:'Lebhaftes Nachtleben, nichts für Kinder.',q:'Bangla Road Patong'},
+  {id:'hk6',t:'Hanuman World Zipline',n:'14 Ziplines und 4 Hängebrücken im Regenwald.',q:'Hanuman World Phuket'},
+  {id:'hk7',t:'Old Phuket Town und Dibuk Road',n:'Spaziergang durch die Altstadt.',q:'Old Phuket Town Dibuk Road'},
+  {id:'hk8',t:'Karon Viewpoint und Promthep Cape',n:'Sonnenuntergang und Aussicht.',q:'Karon Viewpoint Phuket'}
+ ],
+ bkk:[
+  {id:'bk1',t:'Loy Krathong am Fluss',n:'Hauptnacht Di 24. Nov (einzelne Quellen: 25. Nov). Programm läuft 17. bis 29. Nov, am Mahakan Fort 23. bis 25. Nov.',q:'Mahakan Fort Bangkok',top:1},
+  {id:'bk2',t:'Grand Palace und Wat Pho',n:'500 Baht pro Person, das Ticket gilt 7 Tage. Schultern und Knie bedecken.',q:'Grand Palace Bangkok',top:1},
+  {id:'bk3',t:'Wat Arun mit Thai-Kleid Fotos',n:'Am Chao Phraya, Kostüme kann man dort mieten.',q:'Wat Arun Bangkok',top:1},
+  {id:'bk4',t:'Chinatown Yaowarat Streetfood',n:'Abends am besten.',q:'Yaowarat Road Bangkok'},
+  {id:'bk5',t:'Golden Mount (Wat Saket)',n:'100 Baht Eintritt, Treppe mit Glocken und Aussicht.',q:'Golden Mount Bangkok'},
+  {id:'bk6',t:'Chao Phraya Dinner Cruise',n:'Besser vorab buchen.',q:'Chao Phraya dinner cruise Bangkok'},
+  {id:'bk7',t:'ICONSIAM Riverfront',n:'Grosse Mall am Fluss, gut bei Regen.',q:'ICONSIAM Bangkok',in:1},
+  {id:'bk8',t:'Cave Fantasy VR im MBK Center',n:'Im Januar 2026 eröffnet, VR-Achterbahn im 4. Stock.',q:'MBK Center Bangkok',in:1},
+  {id:'bk9',t:'Benjakitti Park und Rooftop Bar',n:'Park beim BTS Asok, abends Aussicht von einer Rooftop Bar.',q:'Benjakitti Park Bangkok'}
+ ]
+};
+// Ideen im Hinzufügen-Tab ergänzen
+Object.keys(MUST).forEach(function(k){MUST[k].forEach(function(m){if((IDEAS[k]||(IDEAS[k]=[])).indexOf(m.t)<0)IDEAS[k].push(m.t);});});
 var TASKS=[
  {id:'pass',t:'Reisepässe prüfen (alle 4)',n:'Gültigkeit für beide Länder prüfen, üblich sind mindestens 6 Monate ab Einreise.',from:'2026-11-11',due:'2026-11-12'},
  {id:'mdac',t:'MDAC Malaysia ausfüllen (alle 4)',n:'Digitale Einreisekarte, kostenlos. QR-Code speichern. Landung in Kuala Lumpur am 14. Nov.',from:'2026-11-12',due:'2026-11-14',links:[['MDAC öffnen','https://imigresen-online.imi.gov.my/mdac/main']]},
@@ -545,6 +614,7 @@ var db=null,docRef=null,syncMode='local',pushTimer=null,LIVE=null;
 function parseLive(snap){try{var d=typeof snap.data==='function'?snap.data():(snap&&snap.data!==undefined?snap.data:snap);if(d&&d.payload){var o=JSON.parse(d.payload);if(o&&typeof o==='object')return o;}}catch(e){}return null;}
 function persistLocal(){try{localStorage.setItem(LS,JSON.stringify(state));}catch(e){}}
 function save(){
+  if(DEMO.on){renderAll();return;}
   state.updated=Date.now();persistLocal();
   if(docRef){clearTimeout(pushTimer);pushTimer=setTimeout(function(){try{var p=docRef.set({payload:JSON.stringify(state)});if(p&&p.catch)p.catch(function(){});}catch(e){}},400);}
   renderAll();
@@ -761,7 +831,7 @@ function ago(ms){var m=Math.round((Date.now()-ms)/6e4);if(m<2)return 'gerade ebe
 function wxHTML(id){
   var w=LIVE&&LIVE.weather&&LIVE.weather[id];if(!w)return '';
   var days=(w.days||[]).slice(0,3).map(function(d){return '<span class="wd"><b>'+esc(String(d.d||''))+'</b>'+esc(String(d.hi))+'° / '+esc(String(d.lo))+'°<i>'+esc(String(d.rain))+'%</i></span>';}).join('');
-  return '<div class="wx"><div class="wn"><strong>'+esc(String(w.t))+'°</strong><span>'+esc(String(w.txt||''))+'</span></div><div class="wr">Regen '+esc(String(w.rain))+'%'+(w.hum?' · Luft '+esc(String(w.hum))+'%':'')+'</div>'+(days?'<div class="wds">'+days+'</div>':'')+'<small>Live vor Ort · '+(LIVE.updated?ago(LIVE.updated):'')+'</small></div>';
+  return '<div class="wx"><div class="wn"><strong>'+esc(String(w.t))+'°</strong><span>'+esc(String(w.txt||''))+'</span></div><div class="wr">Regen '+esc(String(w.rain))+'%'+(w.hum?' · Luft '+esc(String(w.hum))+'%':'')+'</div>'+(days?'<div class="wds">'+days+'</div>':'')+'<small>Live vor Ort · '+(LIVE.updated?ago(LIVE.updated):'')+' · Daten: Open-Meteo.com (CC BY 4.0)</small></div>';
 }
 function liveFlight(f){return LIVE&&LIVE.flights&&LIVE.flights[f.no||(f.from+f.to)]||null;}
 function fsChip(f){
@@ -777,6 +847,70 @@ function liveBanner(){
   return '<div class="sec">Achtung</div><div class="panel livebad">'+bad.map(function(f){var l=liveFlight(f);return '<div class="trow"><div class="tb"><div class="tt">'+esc(f.no||f.air)+' '+f.from+' nach '+f.to+'</div><div class="tm"><span class="stp bad">'+(l.s==='cancel'?'Gestrichen':'Verspätung '+l.min+' Min')+'</span></div>'+(l.note?'<div class="tn">'+esc(l.note)+'</div>':'')+'</div></div>';}).join('')+'</div>';
 }
 
+/* ---------- Must-do, Heute, Demo ---------- */
+function mustDone(id){return !!state.done['m_'+id];}
+function segRain(id){var w=LIVE&&LIVE.weather&&LIVE.weather[id];return w&&typeof w.rain==='number'?w.rain:null;}
+function mustRow(m,city,rainy){
+  var d=mustDone(m.id),tip=rainy&&m.in&&!d?'<span class="stp ok">Regen-Tipp</span>':'';
+  var star=m.top?'<span class="stp warn">Must do</span>':'';
+  var map='<a class="lk" href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(m.q+' '+city)+'" target="_blank" rel="noopener">Karte ↗</a>';
+  return '<div class="trow'+(d?' done':'')+'"><button class="cb" type="button" data-act="must" data-id="'+m.id+'" role="checkbox" aria-checked="'+(d?'true':'false')+'" aria-label="'+esc(m.t)+'">'+(d?ico('check',16):'')+'</button><div class="tb"><div class="tt">'+esc(m.t)+'</div><div class="tn">'+esc(m.n)+'</div><div class="tm">'+star+tip+(m.in?'<span class="stp">drinnen</span>':'')+map+'</div></div></div>';
+}
+function mustHTML(id){
+  var list=MUST[id];if(!list)return '';
+  var seg=SEGS.filter(function(x){return x.id===id;})[0],city=seg?seg.city:id;
+  var r=segRain(id),rainy=r!==null&&r>=60;
+  var done=list.filter(function(m){return mustDone(m.id);}).length;
+  var sorted=list.slice().sort(function(a,b){
+    var da=mustDone(a.id)?1:0,db=mustDone(b.id)?1:0;if(da!==db)return da-db;
+    if(rainy&&!!a.in!==!!b.in)return a.in?-1:1;
+    return (b.top?1:0)-(a.top?1:0);
+  });
+  var open=sorted.length>5&&done===0;
+  var h='<div class="mustbox"><div class="prh"><h4>Must do in '+esc(city)+'</h4><span class="stp '+(done===list.length?'ok':'')+'">'+done+' von '+list.length+'</span></div>';
+  if(rainy)h+='<div class="tn" style="padding:6px 0">Regenwahrscheinlichkeit '+r+'%. Drinnen-Ideen stehen oben.</div>';
+  sorted.forEach(function(m){h+=mustRow(m,city,rainy);});
+  return h+'</div>';
+}
+function demoBanner(){
+  if(!DEMO.on)return '';
+  var t=[];if(DEMO.now)t.push('Datum '+DEMO.now.replace('T',' '));if(DEMO.live)t.push('Live: '+DEMO.live);
+  return '<div class="demo">Demo-Modus aktiv ('+esc(t.join(', '))+'). Eigene Daten werden nicht verändert, nur die Anzeige.</div>';
+}
+function curSeg(){
+  var n=Date.now();
+  for(var i=0;i<SEGS.length;i++){if(n>=SEGS[i].inFl.arrT&&n<SEGS[i].outFl.depT)return SEGS[i];}
+  return null;
+}
+function nextEvents(){
+  var n=Date.now(),E=[];
+  F.forEach(function(f){if(f.depT>n)E.push({t:f.depT,l:'Abflug '+(f.no||f.air)+' '+f.from+' nach '+f.to,f:f});});
+  Object.keys(TR).forEach(function(k){var x=TR[k];if(x.dead)return;var t=inst(x.date,x.time,x.tz);if(t>n)E.push({t:t,l:x.title});});
+  state.items.forEach(function(it){var t=itStart(it);if(t&&t>n)E.push({t:t,l:it.title});});
+  TASKS.forEach(function(t){if(isDone(t.id))return;var due=inst(t.due,'23:59','+01:00');if(due>n&&t.from<=zrhDate(n))E.push({t:due,l:'Aufgabe: '+t.t,task:1});});
+  E.sort(function(a,b){return a.t-b.t;});
+  return E.slice(0,4);
+}
+function todayHTML(){
+  var n=Date.now(),ev=nextEvents(),seg=curSeg();
+  var h='<div class="sec">Heute</div><div class="panel today">';
+  if(seg){
+    var w=LIVE&&LIVE.weather&&LIVE.weather[seg.id];
+    h+='<div class="tdh"><b>Du bist in '+esc(seg.city)+'</b>'+(w?'<span class="stp'+(w.rain>=60?' warn':' ok')+'">'+esc(String(w.t))+'° · '+esc(w.txt||'')+' · Regen '+esc(String(w.rain))+'%</span>':'')+'</div>';
+  }
+  if(!ev.length)h+='<div class="empty">Keine weiteren Termine.</div>';
+  ev.forEach(function(e){
+    var fs=e.f?fsChip(e.f):'';
+    h+='<div class="trow"><div class="tb"><div class="tt">'+esc(e.l)+'</div><div class="tm"><span class="stp">in '+dur(e.t-n)+'</span></div>'+fs+'</div></div>';
+  });
+  var base=seg||SEGS[0],list=(MUST[base.id]||[]).filter(function(m){return !mustDone(m.id);});
+  var r=segRain(base.id),rainy=r!==null&&r>=60;
+  list=list.filter(function(m){return rainy?m.in:m.top;}).slice(0,3);
+  if(list.length&&(seg||n>=F[0].depT-864e5*2)){
+    h+='<div class="nx">'+(rainy?'Regen: drinnen in ':'Als Nächstes in ')+esc(base.city)+'</div>'+list.map(function(m){return mustRow(m,base.city,rainy);}).join('');
+  }
+  return h+'</div>';
+}
 /* ---------- Aufgaben und Erinnerungen ---------- */
 function isDone(id){return !!state.done[id];}
 function taskStatus(t){
@@ -851,7 +985,7 @@ function segCard(s,items){
   }).join('');
   return '<article class="card seg" style="--c:'+c+';--cbg:'+c+'1F;--g:'+s.g+'"><div class="head"><div class="row"><div><div class="cty">'+s.country+' · Ortszeit '+(ahead>0?'+':'')+ahead+' Std zu Zürich</div><h2>'+esc(s.city)+'</h2></div><span class="np">'+nights+(nights===1?' Nacht':' Nächte')+'</span></div>'+
    wxHTML(s.id)+'<div class="time-on-site"><small>Zeit vor Ort</small><strong>'+dur(total)+'</strong><span>Landung '+dShort(s.inFl.a)+' um '+s.inFl.at+', Abflug '+dShort(s.outFl.d)+' um '+s.outFl.dt+'</span></div><div class="art">'+ART[s.id]+'</div></div>'+
-   '<div class="body">'+stays+daysHTML(s,E,dates)+'</div></article>';
+   '<div class="body">'+mustHTML(s.id)+stays+daysHTML(s,E,dates)+'</div></article>';
 }
 function miniBlock(id,title,items){
   var seg=id==='pre'?{id:'pre',tz:'+01:00',outFl:F[0],trObjs:[],stayObjs:[]}:{id:'post',tz:'+01:00',inFl:F[6],trObjs:[],stayObjs:[]};
@@ -923,7 +1057,7 @@ function hintsHTML(){
   }).join('');
 }
 function renderTimeline(){
-  var items=state.items,h=heroHTML()+liveBanner()+reminderHTML()+hintsHTML()+'<div class="sec">Timeline</div><div class="stream">';
+  var items=state.items,h=demoBanner()+heroHTML()+liveBanner()+todayHTML()+reminderHTML()+hintsHTML()+'<div class="sec">Timeline</div><div class="stream">';
   h+=prepCard()+spacer();
   var pre=miniBlock('pre','Vor dem Abflug',items);
   if(pre)h+=pre+spacer();
@@ -1064,6 +1198,7 @@ document.addEventListener('click',function(ev){
   else if(a==='idea'){$('#fTitle').value=b.dataset.v;$('#fTitle').focus();}
   else if(a==='del'){confirmDel=id;renderAddList();}
   else if(a==='delyes'){state.items=state.items.filter(function(i){return i.id!==id;});confirmDel=null;if(editingId===id)resetForm();save();toast('Eintrag gelöscht');}
+  else if(a==='must'){if(DEMO.on)return;if(state.done['m_'+id])delete state.done['m_'+id];else state.done['m_'+id]=true;save();}
   else if(a==='task'){if(state.done[id])delete state.done[id];else state.done[id]=true;save();}
   else if(a==='todo'){state.todos=state.todos.map(function(t){return t.id===id?Object.assign({},t,{done:!t.done}):t;});save();}
   else if(a==='todel'){state.todos=state.todos.filter(function(t){return t.id!==id;});save();}
@@ -1104,6 +1239,29 @@ $('#banAdd').innerHTML=ART.add;$('#banOv').innerHTML=ART.ov;
 fillSelects();resetForm(FIRST);renderAll();
 show(location.hash.replace('#','')||'timeline');
 initDb();
+
+/* ---------- Währung ---------- */
+var LS_FX='reiseplan-fx',FX=null;
+try{FX=JSON.parse(localStorage.getItem(LS_FX)||'null');}catch(e){}
+function fxRender(){
+  var out=$('#fxOut'),info=$('#fxInfo');if(!out)return;
+  if(!FX||!FX.rates){info.textContent='Kein Kurs verfügbar. Mit Internet öffnen, dann wird er gespeichert.';out.innerHTML='';return;}
+  var a=parseFloat($('#fxAmt').value);if(!isFinite(a))a=0;
+  var cur=$('#fxCur').value,r={CHF:1,MYR:FX.rates.MYR,THB:FX.rates.THB},chf=a/r[cur];
+  var names={CHF:'Franken',MYR:'Ringgit',THB:'Baht'};
+  out.innerHTML=['CHF','MYR','THB'].filter(function(c){return c!==cur;}).map(function(c){return '<div><span>'+names[c]+'</span><span>'+(chf*r[c]).toLocaleString('de-CH',{maximumFractionDigits:2})+'</span></div>';}).join('');
+  info.textContent='Kurs vom '+FX.date+' (Europäische Zentralbank über Frankfurter). 1 CHF = '+r.MYR.toFixed(2)+' MYR = '+r.THB.toFixed(2)+' THB. Echte Wechselkurse bei Karte oder Bank weichen ab.';
+}
+function fxLoad(){
+  if(typeof fetch!=='function')return;
+  fetch('https://api.frankfurter.app/latest?from=CHF&to=MYR,THB').then(function(r){if(!r.ok)throw new Error('http');return r.json();}).then(function(j){
+    if(j&&j.rates&&j.rates.MYR&&j.rates.THB){FX={date:j.date,rates:{MYR:j.rates.MYR,THB:j.rates.THB}};try{localStorage.setItem(LS_FX,JSON.stringify(FX));}catch(e){}}
+    fxRender();
+  }).catch(function(){fxRender();});
+}
+document.addEventListener('input',function(e){if(e.target&&(e.target.id==='fxAmt'))fxRender();});
+document.addEventListener('change',function(e){if(e.target&&e.target.id==='fxCur')fxRender();});
+setTimeout(function(){fxRender();fxLoad();},500);
 
 /* ---------- Live-Abruf direkt aus dem Browser (nur wenn erlaubt, z. B. GitHub Pages) ---------- */
 var WXP=[['kl',3.14,101.69],['lgk',6.35,99.80],['hkt',7.88,98.30],['bkk',13.76,100.50]];
@@ -1164,8 +1322,17 @@ document.addEventListener('click',function(e){
   if(t.id==='liveNow'){setLiveInfo('Wird abgerufen ...');liveAll();}
   if(t.id==='fkeySave'){var v=($('#fkey').value||'').trim();try{if(v)localStorage.setItem(LS_FK,v);}catch(er){}$('#fkey').value='';$('#fkeyInfo').textContent=v?'Schlüssel gespeichert. Prüfe Flüge ...':'Kein Schlüssel eingegeben.';if(v)loadFlights();}
 });
-setTimeout(function(){applyNet();liveAll();},600);
-setInterval(liveAll,600000);
+if(DEMO.live){
+  var base={updated:Date.now()};
+  liveNet.updated=Date.now();
+  WXP.forEach(function(p){liveNet.weather[p[0]]={t:31,txt:DEMO.live==='rain'?'Gewitter':'Teils bewölkt',rain:DEMO.live==='rain'?85:30,hum:78,days:[{d:'Do',hi:32,lo:25,rain:DEMO.live==='rain'?85:30},{d:'Fr',hi:32,lo:25,rain:50},{d:'Sa',hi:33,lo:26,rain:40}]};});
+  if(DEMO.live==='delay')liveNet.flights.QR96={s:'delay',min:75,new:'16:25',gate:'A12',note:'Demo: Abflug später, Umstieg in Doha wird knapper.'};
+  if(DEMO.live==='cancel')liveNet.flights.QR96={s:'cancel',min:0,note:'Demo: Flug gestrichen, bitte bei Qatar Airways melden.'};
+  if(DEMO.live==='ok')liveNet.flights.QR96={s:'ok',min:0,gate:'A12'};
+}
+
+setTimeout(function(){applyNet();if(!DEMO.live)liveAll();},600);
+setInterval(function(){if(!DEMO.live)liveAll();},600000);
 })();
 </script>
 </body>
