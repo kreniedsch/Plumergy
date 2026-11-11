@@ -51,6 +51,23 @@ h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance}
 .b-add{background:linear-gradient(120deg,#FFC93C,#FF8A4C 55%,#FF5E8A)}
 .b-ov{background:linear-gradient(120deg,#12B5A6,#2B8CF0 60%,#7B5CFF)}
 @keyframes bobx{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+.mhead{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:4px 0 2px}.mhead h2{margin:0;font-size:24px}
+.mchips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 14px}
+.mchip{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:8px 14px;font-weight:800;font-size:14px;color:var(--ink)}
+.mchip.on{background:var(--c,#0C9E92);border-color:var(--c,#0C9E92);color:#fff}
+.mgrid{display:grid;gap:12px;margin-bottom:6px}
+.mc{background:#fff;border-radius:20px;padding:14px 14px 12px;box-shadow:0 8px 22px rgba(14,26,43,.08);border-top:5px solid var(--c);position:relative}
+.mc h3{margin:10px 0 4px;font-size:18px;line-height:1.25}.mc p{margin:0;color:var(--ink2);font-size:14px;line-height:1.4}
+.mc .mh{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.mc .mn{width:30px;height:30px;border-radius:10px;background:var(--g);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:14px}
+.mc .mcity{font-size:12px;font-weight:800;color:var(--c);text-transform:uppercase;letter-spacing:.06em}
+.mtag{border-radius:99px;padding:3px 9px;font-size:11.5px;font-weight:800;background:var(--soft);color:var(--ink2)}
+.mtag.hot{background:linear-gradient(135deg,#FF8A00,#E83A5F);color:#fff}.mtag.rain{background:var(--okbg);color:var(--ok)}
+.mb{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.mbtn{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:9px 12px;font-weight:800;font-size:13.5px;color:var(--ink);text-decoration:none}
+.mbtn.on{background:var(--ok);border-color:var(--ok);color:#fff}
+.mc.done{opacity:.6}
+
 .mustbox{margin:0 0 14px;padding:12px 14px;border-radius:16px;background:linear-gradient(135deg,#FFF6E0,#FFE9F0);border:1px solid #F6D9B8}
 .mustbox h4{margin:0;font-size:16px}
 .mustbox .trow{border-bottom:1px solid rgba(0,0,0,.06)}
@@ -235,7 +252,7 @@ h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance}
 
 /* Tab bar */
 .tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;padding:8px 14px calc(8px + env(safe-area-inset-bottom));background:rgba(242,244,248,.92);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-top:1px solid var(--line)}
-.tabs .in{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:6px;background:var(--card);border-radius:20px;padding:5px;box-shadow:0 6px 24px rgba(14,26,43,.1)}
+.tabs .in{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:var(--card);border-radius:20px;padding:5px;box-shadow:0 6px 24px rgba(14,26,43,.1)}
 .tabs button{border:0;background:transparent;border-radius:15px;padding:9px 4px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:12px;font-weight:700;color:var(--muted)}
 .tabs button[aria-current="page"]{background:linear-gradient(135deg,#0C9E92,#5B3FE0);color:#fff}
 
@@ -317,6 +334,7 @@ textarea.in-c{min-height:74px;resize:vertical}
 <main class="wrap">
   <section id="v-timeline" class="view" aria-label="Timeline"><div id="tl"></div></section>
 
+  <section id="v-must" class="view" aria-label="Must do" hidden><div id="mustView"></div></section>
   <section id="v-add" class="view" aria-label="Hinzufügen" hidden>
     <div class="banner b-add" id="banAdd"></div>
     <div class="panel">
@@ -413,6 +431,7 @@ textarea.in-c{min-height:74px;resize:vertical}
 
 <nav class="tabs" aria-label="Bereiche"><div class="in">
   <button type="button" data-tab="timeline" id="tab-timeline"></button>
+  <button type="button" data-tab="must" id="tab-must"></button>
   <button type="button" data-tab="add" id="tab-add"></button>
   <button type="button" data-tab="overview" id="tab-overview"></button>
 </div></nav>
@@ -872,6 +891,43 @@ function mustHTML(id){
   sorted.forEach(function(m){h+=mustRow(m,city,rainy);});
   return h+'</div>';
 }
+function mustMini(m,city,rainy){
+  var tip=rainy&&m.in?'<span class="stp ok">Regen-Tipp</span>':'';
+  return '<div class="trow"><div class="tb"><div class="tt">'+esc(m.t)+'</div><div class="tn">'+esc(m.n)+'</div><div class="tm">'+tip+'<a class="lk" href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(m.q+' '+city)+'" target="_blank" rel="noopener">Karte ↗</a></div></div></div>';
+}
+var mustCity='all';
+function mustPlanDate(seg){var st=seg.stayObjs[0];return addDays(st.ci,1)<=seg.stayObjs[seg.stayObjs.length-1].co?addDays(st.ci,1):st.ci;}
+function mustCard(m,seg,rank,rainy){
+  var d=mustDone(m.id),c=seg.color;
+  var tags=(m.top?'<span class="mtag hot">Must do</span>':'')+(m.in?'<span class="mtag">drinnen</span>':'')+(rainy&&m.in&&!d?'<span class="mtag rain">Regen-Tipp</span>':'');
+  var map='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(m.q+' '+seg.city);
+  return '<article class="mc'+(d?' done':'')+'" style="--c:'+c+';--g:'+seg.g+'"><div class="mh"><span class="mn">'+rank+'</span><span class="mcity">'+esc(seg.city)+'</span>'+tags+'</div>'+
+   '<h3>'+esc(m.t)+'</h3><p>'+esc(m.n)+'</p>'+
+   '<div class="mb"><a class="mbtn" href="'+map+'" target="_blank" rel="noopener">'+ico('compass',16)+'Karte</a>'+
+   '<button class="mbtn" type="button" data-act="mustplan" data-id="'+m.id+'" data-city="'+seg.id+'">'+ico('plus',16)+'Zum Plan</button>'+
+   '<button class="mbtn'+(d?' on':'')+'" type="button" data-act="must" data-id="'+m.id+'" aria-pressed="'+(d?'true':'false')+'">'+(d?ico('check',16)+'Gemacht':'Gemacht?')+'</button></div></article>';
+}
+function renderMust(){
+  var el=$('#mustView');if(!el)return;
+  var chips='<button type="button" class="mchip'+(mustCity==='all'?' on':'')+'" data-act="mcity" data-id="all">Alle</button>'+SEGS.map(function(g){return '<button type="button" class="mchip'+(mustCity===g.id?' on':'')+'" style="--c:'+g.color+'" data-act="mcity" data-id="'+g.id+'">'+esc(g.city.replace('Kuala Lumpur','KL'))+'</button>';}).join('');
+  var segs=mustCity==='all'?SEGS:SEGS.filter(function(g){return g.id===mustCity;});
+  var total=0,done=0;SEGS.forEach(function(g){(MUST[g.id]||[]).forEach(function(m){total++;if(mustDone(m.id))done++;});});
+  var h='<div class="banner" id="banMust">'+(mustCity==='all'?ART.hero:(ART[mustCity]||ART.hero))+'</div>'+
+    '<div class="mhead"><h2>Must do</h2><span class="stp '+(done===total?'ok':'')+'">'+done+' von '+total+' gemacht</span></div>'+
+    '<p class="sub">Die beliebtesten Ideen pro Station. Mit «Zum Plan» landet eine Idee in deiner Timeline.</p><div class="mchips">'+chips+'</div>';
+  segs.forEach(function(g){
+    var r=segRain(g.id),rainy=r!==null&&r>=60;
+    var list=(MUST[g.id]||[]).slice().sort(function(a,b){
+      var da=mustDone(a.id)?1:0,db=mustDone(b.id)?1:0;if(da!==db)return da-db;
+      if(rainy&&!!a.in!==!!b.in)return a.in?-1:1;
+      return (b.top?1:0)-(a.top?1:0);
+    });
+    if(mustCity==='all')h+='<div class="sec" style="color:'+g.color+'">'+esc(g.city)+(rainy?' · Regen '+r+'%':'')+'</div>';
+    else if(rainy)h+='<div class="demo">Regenwahrscheinlichkeit '+r+'%. Drinnen-Ideen stehen oben.</div>';
+    h+='<div class="mgrid">'+list.map(function(m,i){return mustCard(m,g,i+1,rainy);}).join('')+'</div>';
+  });
+  el.innerHTML=h;
+}
 function demoBanner(){
   if(!DEMO.on)return '';
   var t=[];if(DEMO.now)t.push('Datum '+DEMO.now.replace('T',' '));if(DEMO.live)t.push('Live: '+DEMO.live);
@@ -907,7 +963,7 @@ function todayHTML(){
   var r=segRain(base.id),rainy=r!==null&&r>=60;
   list=list.filter(function(m){return rainy?m.in:m.top;}).slice(0,3);
   if(list.length&&(seg||n>=F[0].depT-864e5*2)){
-    h+='<div class="nx">'+(rainy?'Regen: drinnen in ':'Als Nächstes in ')+esc(base.city)+'</div>'+list.map(function(m){return mustRow(m,base.city,rainy);}).join('');
+    h+='<div class="nx">'+(rainy?'Regen: drinnen in ':'Als Nächstes in ')+esc(base.city)+'</div>'+list.map(function(m){return mustMini(m,base.city,rainy);}).join('');
   }
   return h+'</div>';
 }
@@ -985,7 +1041,7 @@ function segCard(s,items){
   }).join('');
   return '<article class="card seg" style="--c:'+c+';--cbg:'+c+'1F;--g:'+s.g+'"><div class="head"><div class="row"><div><div class="cty">'+s.country+' · Ortszeit '+(ahead>0?'+':'')+ahead+' Std zu Zürich</div><h2>'+esc(s.city)+'</h2></div><span class="np">'+nights+(nights===1?' Nacht':' Nächte')+'</span></div>'+
    wxHTML(s.id)+'<div class="time-on-site"><small>Zeit vor Ort</small><strong>'+dur(total)+'</strong><span>Landung '+dShort(s.inFl.a)+' um '+s.inFl.at+', Abflug '+dShort(s.outFl.d)+' um '+s.outFl.dt+'</span></div><div class="art">'+ART[s.id]+'</div></div>'+
-   '<div class="body">'+mustHTML(s.id)+stays+daysHTML(s,E,dates)+'</div></article>';
+   '<div class="body">'+stays+daysHTML(s,E,dates)+'</div></article>';
 }
 function miniBlock(id,title,items){
   var seg=id==='pre'?{id:'pre',tz:'+01:00',outFl:F[0],trObjs:[],stayObjs:[]}:{id:'post',tz:'+01:00',inFl:F[6],trObjs:[],stayObjs:[]};
@@ -1181,13 +1237,13 @@ function renderOverview(){
 var tab='timeline';
 function go(t){if(location.hash!=='#'+t){try{location.hash=t;}catch(e){}}show(t);}
 function show(t){
-  if(['timeline','add','overview'].indexOf(t)<0)t='timeline';
+  if(['timeline','must','add','overview'].indexOf(t)<0)t='timeline';
   tab=t;
-  ['timeline','add','overview'].forEach(function(n){var v=$('#v-'+n),b=$('#tab-'+n);v.hidden=n!==t;if(n===t)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
+  ['timeline','must','add','overview'].forEach(function(n){var v=$('#v-'+n),b=$('#tab-'+n);v.hidden=n!==t;if(n===t)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
 }
 var toastT=null;
 function toast(m){var el=$('#toast');el.textContent=m;el.hidden=false;clearTimeout(toastT);toastT=setTimeout(function(){el.hidden=true;},2600);}
-function renderAll(){renderTimeline();renderAddList();renderOverview();}
+function renderAll(){renderTimeline();renderMust();renderAddList();renderOverview();}
 
 document.addEventListener('click',function(ev){
   var b=ev.target.closest('[data-act],[data-tab]');if(!b)return;
@@ -1198,6 +1254,12 @@ document.addEventListener('click',function(ev){
   else if(a==='idea'){$('#fTitle').value=b.dataset.v;$('#fTitle').focus();}
   else if(a==='del'){confirmDel=id;renderAddList();}
   else if(a==='delyes'){state.items=state.items.filter(function(i){return i.id!==id;});confirmDel=null;if(editingId===id)resetForm();save();toast('Eintrag gelöscht');}
+  else if(a==='mcity'){mustCity=id;renderMust();}
+  else if(a==='mustplan'){
+    var seg=SEGS.filter(function(g){return g.id===b.dataset.city;})[0],mm=null;
+    Object.keys(MUST).forEach(function(k){MUST[k].forEach(function(x){if(x.id===id)mm=x;});});
+    if(seg&&mm){resetForm(mustPlanDate(seg));$('#fCity').value=seg.id;updatePreview();updateIdeas();$('#fTitle').value=mm.t;go('add');window.scrollTo(0,0);toast('Zeit wählen und speichern');}
+  }
   else if(a==='must'){if(DEMO.on)return;if(state.done['m_'+id])delete state.done['m_'+id];else state.done['m_'+id]=true;save();}
   else if(a==='task'){if(state.done[id])delete state.done[id];else state.done[id]=true;save();}
   else if(a==='todo'){state.todos=state.todos.map(function(t){return t.id===id?Object.assign({},t,{done:!t.done}):t;});save();}
@@ -1233,6 +1295,7 @@ window.addEventListener('hashchange',function(){show(location.hash.replace('#','
 
 /* ---------- Start ---------- */
 $('#tab-timeline').innerHTML=ico('list',20)+'<span>Timeline</span>';
+$('#tab-must').innerHTML=ico('compass',20)+'<span>Must do</span>';
 $('#tab-add').innerHTML=ico('plus',20)+'<span>Hinzufügen</span>';
 $('#tab-overview').innerHTML=ico('grid',20)+'<span>Übersicht</span>';
 $('#banAdd').innerHTML=ART.add;$('#banOv').innerHTML=ART.ov;
