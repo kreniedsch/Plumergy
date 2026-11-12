@@ -1,5 +1,5 @@
 // Reiseplan Offline-Cache. Bei Änderungen an der App VERSION erhöhen.
-var VERSION='reiseplan-v2';
+var VERSION='reiseplan-v3';
 var CORE=['./','index.html','manifest.json','icon-192.png','icon-512.png','apple-touch-icon.png'];
 self.addEventListener('install',function(e){
   e.waitUntil(caches.open(VERSION).then(function(c){return c.addAll(CORE);}).then(function(){return self.skipWaiting();}));

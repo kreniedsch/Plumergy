@@ -922,10 +922,14 @@ function fsChip(f){
 var APXY={ZRH:[47.4647,8.5492],DOH:[25.2731,51.6081],KUL:[2.7456,101.7099],LGK:[6.3297,99.7287],HKT:[8.1132,98.3169],BKK:[13.69,100.7501]};
 function kmBetween(a,b){var R=6371,r=Math.PI/180,dl=(b[0]-a[0])*r,dn=(b[1]-a[1])*r,x=Math.sin(dl/2)*Math.sin(dl/2)+Math.cos(a[0]*r)*Math.cos(b[0]*r)*Math.sin(dn/2)*Math.sin(dn/2);return 2*R*Math.asin(Math.sqrt(x));}
 function radarChip(f){
-  if(typeof liveNet==='undefined'||!liveNet.radar)return '';
-  var now=Date.now();if(now<f.depT-2*H||now>f.arrT+H)return '';
+  if(typeof liveNet==='undefined')return '';liveNet.radar=liveNet.radar||{};
+  var now=Date.now();
+  if(!radarCalls(f).length)return '';
+  if(now>f.arrT+H)return '';
+  if(now<f.depT-2*H){var st=new Date(f.depT-2*H);return '<div class="fs"><b>Live-Radar</b><span>Startet automatisch '+st.toLocaleString('de-CH',{weekday:'short',day:'numeric',month:'numeric',hour:'2-digit',minute:'2-digit',timeZone:'Europe/Zurich'})+' (Schweizer Zeit), 2 Std. vor Abflug.</span></div>';}
   var r=liveNet.radar[f.id];
-  if(!r||!r.found){return (r&&now-r.t<15*6e4)?'<div class="fs"><b>Radar</b><span>Noch kein Signal. Der Flug ist am Boden oder gerade ausser Reichweite der Empfänger (über dem Meer normal).</span><small>Geprüft '+ago(r.t)+'</small></div>':'';}
+  if(!r)return '<div class="fs"><b>Live-Radar</b><span>Suche läuft …</span></div>';
+  if(!r.found){return (now-r.t<15*6e4)?'<div class="fs"><b>Radar</b><span>Noch kein Signal. Der Flug ist am Boden oder gerade ausser Reichweite der Empfänger (über dem Meer normal).</span><small>Geprüft '+ago(r.t)+'</small></div>':'';}
   if(now-r.t>15*6e4)return '';
   var tot=kmBetween(APXY[f.from],APXY[f.to]),left=kmBetween([r.lat,r.lon],APXY[f.to]),pct=Math.max(0,Math.min(100,Math.round((1-left/tot)*100)));
   var st=r.ground?'Am Boden':'In der Luft';
