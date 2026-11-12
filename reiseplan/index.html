@@ -63,6 +63,7 @@ h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance}
 .mc .mcity{font-size:12px;font-weight:800;color:var(--c);text-transform:uppercase;letter-spacing:.06em}
 .mtag{border-radius:99px;padding:3px 9px;font-size:11.5px;font-weight:800;background:var(--soft);color:var(--ink2)}
 .mtag.food{background:#FFF1D6;color:#8A5200}.mtag.hot{background:linear-gradient(135deg,#FF8A00,#E83A5F);color:#fff}.mtag.rain{background:var(--okbg);color:var(--ok)}
+.mr{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:10px;font-size:12.5px;font-weight:700;color:var(--mute,#6b7280)}.mr a{color:var(--c,#2563eb);background:#fff;border:1.5px solid var(--line);border-radius:999px;padding:4px 10px;text-decoration:none;font-weight:800}
 .mb{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
 .mbtn{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:9px 12px;font-weight:800;font-size:13.5px;color:var(--ink);text-decoration:none}
 .mbtn.on{background:var(--ok);border-color:var(--ok);color:#fff}
@@ -960,8 +961,10 @@ function mustCard(m,seg,rank,rainy){
   var d=mustDone(m.id),c=seg.color;
   var tags=(m.top?'<span class="mtag hot">Must do</span>':'')+(m.food?'<span class="mtag food">Essen</span>':'')+(m.drink?'<span class="mtag food">Trinken</span>':'')+(m.viral?'<span class="mtag food">Viral</span>':'')+(m.in?'<span class="mtag">drinnen</span>':'')+(rainy&&m.in&&!d?'<span class="mtag rain">Regen-Tipp</span>':'');
   var map='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(m.q+' '+seg.city);
+  var sq=encodeURIComponent(m.t+' '+seg.city);var gq='https://www.google.com/search?q='+sq,gi='https://www.google.com/search?tbm=isch&q='+sq,tt='https://www.tiktok.com/search?q='+sq,yt='https://www.youtube.com/results?search_query='+sq;
   return '<article class="mc'+(d?' done':'')+'" style="--c:'+c+';--g:'+seg.g+'"><div class="mh"><span class="mn">'+rank+'</span><span class="mcity">'+esc(seg.city)+'</span>'+tags+'</div>'+
    '<h3>'+esc(m.t)+'</h3><p>'+esc(m.n)+'</p>'+
+   '<div class="mr"><span>Recherche:</span><a href="'+gq+'" target="_blank" rel="noopener">Google</a><a href="'+gi+'" target="_blank" rel="noopener">Bilder</a><a href="'+tt+'" target="_blank" rel="noopener">TikTok</a><a href="'+yt+'" target="_blank" rel="noopener">YouTube</a></div>'+
    '<div class="mb"><a class="mbtn" href="'+map+'" target="_blank" rel="noopener">'+ico('compass',16)+'Karte</a>'+
    '<button class="mbtn" type="button" data-act="mustplan" data-id="'+m.id+'" data-city="'+seg.id+'">'+ico('plus',16)+'Zum Plan</button>'+
    '<button class="mbtn'+(d?' on':'')+'" type="button" data-act="must" data-id="'+m.id+'" aria-pressed="'+(d?'true':'false')+'">'+(d?ico('check',16)+'Gemacht':'Gemacht?')+'</button></div></article>';
