@@ -944,7 +944,7 @@ function routeMap(f,pos){
 function hhmm(ms,off){var m=/([+-])(\d\d):(\d\d)/.exec(off||'+00:00'),o=(m[1]==='-'?-1:1)*(+m[2]*60+ +m[3]);return new Date(ms+o*6e4).toISOString().substr(11,5);}
 function radarChip(f){
   if(typeof liveNet==='undefined')return '';liveNet.radar=liveNet.radar||{};
-  if(!radarCalls(f).length)return '';
+  if(!radarCalls(f).length)return (Date.now()>f.arrT+H)?'':'<div class="fs"><b>Strecke</b><span>Keine Flugnummer hinterlegt, daher kein Live-Radar. Trage die Nummer ein (siehe Buchung), dann wird dieser Flug getrackt.</span>'+routeMap(f,null)+'</div>';
   var now=Date.now();
   if(now>f.arrT+H)return '';
   var sched=f.from+' '+hhmm(f.depT,f.dz)+' → '+f.to+' '+hhmm(f.arrT,f.az)+' (Ortszeit)';
