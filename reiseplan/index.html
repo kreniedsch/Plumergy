@@ -921,20 +921,56 @@ function fsChip(f){
 }
 var APXY={ZRH:[47.4647,8.5492],DOH:[25.2731,51.6081],KUL:[2.7456,101.7099],LGK:[6.3297,99.7287],HKT:[8.1132,98.3169],BKK:[13.69,100.7501]};
 function kmBetween(a,b){var R=6371,r=Math.PI/180,dl=(b[0]-a[0])*r,dn=(b[1]-a[1])*r,x=Math.sin(dl/2)*Math.sin(dl/2)+Math.cos(a[0]*r)*Math.cos(b[0]*r)*Math.sin(dn/2)*Math.sin(dn/2);return 2*R*Math.asin(Math.sqrt(x));}
+function routeMap(f,pos){
+  var A=APXY[f.from],B=APXY[f.to];if(!A||!B)return '';
+  var r=Math.PI/180,pts=[],i;
+  function v(p){var la=p[0]*r,lo=p[1]*r;return [Math.cos(la)*Math.cos(lo),Math.cos(la)*Math.sin(lo),Math.sin(la)];}
+  var a=v(A),b=v(B),w=Math.acos(Math.max(-1,Math.min(1,a[0]*b[0]+a[1]*b[1]+a[2]*b[2]))),sw=Math.sin(w)||1;
+  for(i=0;i<=40;i++){var t=i/40,k1=Math.sin((1-t)*w)/sw,k2=Math.sin(t*w)/sw,x=k1*a[0]+k2*b[0],y=k1*a[1]+k2*b[1],z=k1*a[2]+k2*b[2];pts.push([Math.atan2(z,Math.sqrt(x*x+y*y))/r,Math.atan2(y,x)/r]);}
+  var all=pts.slice();if(pos)all.push([pos.lat,pos.lon]);
+  var la=all.map(function(p){return p[0];}),lo=all.map(function(p){return p[1];});
+  var la0=Math.min.apply(0,la),la1=Math.max.apply(0,la),lo0=Math.min.apply(0,lo),lo1=Math.max.apply(0,lo);
+  var kx=Math.cos(((la0+la1)/2)*r),W=300,Hh=130,pad=26,sx=(lo1-lo0)*kx||1,sy=(la1-la0)||1,sc=Math.min((W-2*pad)/sx,(Hh-2*pad)/sy);
+  var ox=(W-sx*sc)/2,oy=(Hh-sy*sc)/2;
+  function P(p){return [ox+(p[1]-lo0)*kx*sc,Hh-oy-(p[0]-la0)*sc];}
+  var d=pts.map(function(p,j){var q=P(p);return (j?'L':'M')+q[0].toFixed(1)+' '+q[1].toFixed(1);}).join('');
+  var pa=P(A),pb=P(B),o='<svg viewBox="0 0 '+W+' '+Hh+'" style="width:100%;height:auto;margin-top:8px;background:#0000000a;border-radius:10px">';
+  o+='<path d="'+d+'" fill="none" stroke="currentColor" stroke-opacity=".35" stroke-width="2" stroke-dasharray="5 4"/>';
+  o+='<circle cx="'+pa[0]+'" cy="'+pa[1]+'" r="4" fill="currentColor"/><circle cx="'+pb[0]+'" cy="'+pb[1]+'" r="4" fill="currentColor"/>';
+  o+='<text x="'+pa[0]+'" y="'+(pa[1]+16)+'" font-size="11" text-anchor="middle" fill="currentColor">'+f.from+'</text><text x="'+pb[0]+'" y="'+(pb[1]+16)+'" font-size="11" text-anchor="middle" fill="currentColor">'+f.to+'</text>';
+  if(pos){var q=P([pos.lat,pos.lon]);o+='<circle cx="'+q[0]+'" cy="'+q[1]+'" r="9" fill="#0C9E92" fill-opacity=".25"/><circle cx="'+q[0]+'" cy="'+q[1]+'" r="5" fill="#0C9E92" stroke="#fff" stroke-width="1.5"/>';}
+  return o+'</svg>';
+}
+function hhmm(ms,off){var m=/([+-])(\d\d):(\d\d)/.exec(off||'+00:00'),o=(m[1]==='-'?-1:1)*(+m[2]*60+ +m[3]);return new Date(ms+o*6e4).toISOString().substr(11,5);}
 function radarChip(f){
   if(typeof liveNet==='undefined')return '';liveNet.radar=liveNet.radar||{};
-  var now=Date.now();
   if(!radarCalls(f).length)return '';
+  var now=Date.now();
   if(now>f.arrT+H)return '';
-  if(now<f.depT-2*H){var st=new Date(f.depT-2*H);return '<div class="fs"><b>Live-Radar</b><span>Startet automatisch '+st.toLocaleString('de-CH',{weekday:'short',day:'numeric',month:'numeric',hour:'2-digit',minute:'2-digit',timeZone:'Europe/Zurich'})+' (Schweizer Zeit), 2 Std. vor Abflug.</span></div>';}
+  var sched=f.from+' '+hhmm(f.depT,f.dz)+' → '+f.to+' '+hhmm(f.arrT,f.az)+' (Ortszeit)';
+  if(now<f.depT-2*H){var st=new Date(f.depT-2*H);return '<div class="fs"><b>Live-Status</b><span>Startet automatisch '+st.toLocaleString('de-CH',{weekday:'short',day:'numeric',month:'numeric',hour:'2-digit',minute:'2-digit',timeZone:'Europe/Zurich'})+' (Schweizer Zeit), 2 Std. vor Abflug.</span>'+routeMap(f,null)+'</div>';}
   var r=liveNet.radar[f.id];
-  if(!r)return '<div class="fs"><b>Live-Radar</b><span>Suche läuft …</span></div>';
-  if(!r.found){return (now-r.t<15*6e4)?'<div class="fs"><b>Radar</b><span>Noch kein Signal. Der Flug ist am Boden oder gerade ausser Reichweite der Empfänger (über dem Meer normal).</span><small>Geprüft '+ago(r.t)+'</small></div>':'';}
-  if(now-r.t>15*6e4)return '';
+  if(!r)return '<div class="fs"><b>Live-Status</b><span>Suche läuft …</span>'+routeMap(f,null)+'</div>';
+  var fresh=now-r.t<15*6e4;
+  if(!r.found||!fresh){
+    var m=now<f.depT?'Noch vor Abflug. Planmässig '+sched+'.':(now<f.depT+20*6e4?'Abflugzeit erreicht, noch kein Signal (Boden oder ausser Reichweite).':'Kein Signal. Über dem Meer oder in abgelegenen Gebieten normal.');
+    return '<div class="fs"><b>Live-Status</b><span>'+m+'</span><small>Geprüft '+ago(r.t)+'</small>'+routeMap(f,null)+'</div>';}
   var tot=kmBetween(APXY[f.from],APXY[f.to]),left=kmBetween([r.lat,r.lon],APXY[f.to]),pct=Math.max(0,Math.min(100,Math.round((1-left/tot)*100)));
-  var st=r.ground?'Am Boden':'In der Luft';
-  var info=(r.ground?'':fmtN(r.alt)+' m · '+fmtN(r.gs)+' km/h · ')+(r.type?esc(r.type)+(r.reg?' '+esc(r.reg):'')+' · ':'')+'noch '+fmtN(left)+' km bis '+esc(APC[f.to]);
-  return '<div class="fs ok"><b>Live-Radar: '+st+'</b><span>'+info+'</span><div style="height:6px;border-radius:6px;background:#0001;margin:8px 0 2px;overflow:hidden"><div style="width:'+pct+'%;height:100%;background:var(--ok,#0C9E92)"></div></div><small>'+pct+' % der Strecke · '+ago(r.t)+'</small></div>';
+  var head,cls='ok',line;
+  var nearDest=left<40;
+  if(r.ground&&nearDest){head='Gelandet';line='In '+esc(APC[f.to])+' am Boden. Planmässige Ankunft '+hhmm(f.arrT,f.az)+'.';pct=100;}
+  else if(r.ground){
+    var late=Math.round((now-f.depT)/6e4);
+    if(late>10){head='Noch am Boden';cls='warn';line='Abflug planmässig '+hhmm(f.depT,f.dz)+' – Verspätung ca. '+late+' Min (Schätzung).';}
+    else{head='Am Boden';line=(late<0?'Abflug planmässig in '+(-late)+' Min ('+hhmm(f.depT,f.dz)+').':'Abflug jetzt.');}
+  }else{
+    head='In der Luft';
+    line=fmtN(r.alt)+' m · '+fmtN(r.gs)+' km/h · '+(r.type?esc(r.type)+(r.reg?' '+esc(r.reg):'')+' · ':'')+'noch '+fmtN(left)+' km bis '+esc(APC[f.to]);
+    if(r.gs>250){var eta=now+left/r.gs*H,d=Math.round((eta-f.arrT)/6e4);
+      line+='<br>Ankunft voraussichtlich '+hhmm(eta,f.az)+' (planmässig '+hhmm(f.arrT,f.az)+') · '+(Math.abs(d)<=10?'pünktlich':(d>0?'ca. +'+d+' Min verspätet':'ca. '+(-d)+' Min früher'));
+      if(d>10)cls='warn';}
+  }
+  return '<div class="fs '+cls+'"><b>Live-Status: '+head+'</b><span>'+line+'</span><div style="height:6px;border-radius:6px;background:#0001;margin:8px 0 2px;overflow:hidden"><div style="width:'+pct+'%;height:100%;background:#0C9E92"></div></div>'+routeMap(f,r)+'<small>'+pct+' % der Strecke · '+ago(r.t)+'</small></div>';
 }
 function fmtN(n){return Math.round(n).toLocaleString('de-CH');}
 function liveBanner(){
