@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <title>Reiseplan Malaysia Thailand</title>
 <link rel="icon" type="image/png" href="icon-192.png">
@@ -312,6 +312,7 @@ textarea.in-c{min-height:74px;resize:vertical}
 .toast[hidden]{display:none}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 @media (max-width:380px){.fl .time{font-size:27px}.hero h1{font-size:26px}}
+html,body{touch-action:manipulation;-webkit-text-size-adjust:100%}
 </style>
 </head>
 <body>
@@ -575,7 +576,13 @@ var MUST={
    {id:'kl14',t:'Frischer Zuckerrohrsaft',n:'Am Strassenstand frisch gepresst, mit Eis und einem Spritzer Zitrus.',q:'Sugarcane juice Jalan Alor',drink:1},
    {id:'kl15',t:'Mon Chinese Beef Roti',n:'Knuspriger Fladen mit Rind (RM 6,50) oder Huhn (RM 5,50), täglich bis Mitternacht. Oft lange Schlange. Weniger Andrang: JOY in Chinatown. Angaben zum Halal-Status widersprechen sich.',q:'Mon Chinese Beef Roti Bukit Bintang',top:1,food:1,viral:1},
    {id:'kl16',t:'Roti Tisu',n:'Riesiges, hauchdünnes Roti, bei Touristen gerade sehr beliebt und oft auf TikTok zu sehen.',q:'Roti tisu Kuala Lumpur',food:1,viral:1},
-   {id:'kl17',t:'Cham (Kaffee-Tee-Mix)',n:'Kopi und Tee mit Kondensmilch gemischt. Eiskalt als «Ais Kopi Cham» oder «Cham Peng» bestellen. Gibt es in jedem Kopitiam. Tipp: Restoran Poh Yap (im Imbi Market, ICC Pudu).',q:'Restoran Poh Yap Imbi Market ICC Pudu',top:1,drink:1}
+   {id:'kl17',t:'Cham (Kaffee-Tee-Mix)',n:'Kopi und Tee mit Kondensmilch gemischt. Eiskalt als «Ais Kopi Cham» oder «Cham Peng» bestellen. Gibt es in jedem Kopitiam. Tipp: Restoran Poh Yap (im Imbi Market, ICC Pudu).',q:'Restoran Poh Yap Imbi Market ICC Pudu',top:1,drink:1},
+   {id:'kl18',t:'Kwai Chai Hong',n:'Restaurierte Gasse in Chinatown mit Wandbildern, Cafés und Restaurants. Beliebter Fotospot.',q:'Kwai Chai Hong Kuala Lumpur'},
+   {id:'kl19',t:'Jalan Alor: Hähnchenflügel vom Holzkohlegrill',n:'Das Signaturgericht der Strasse: süss glasiert, rauchig, knusprig. Ab ca. 18 Uhr, Wong Ah Wah ist der bekannteste Stand.',q:'Wong Ah Wah Jalan Alor',food:1,top:1},
+   {id:'kl20',t:'Nasi Lemak Alor Corner',n:'Nasi-Lemak-Stand an der Jalan Alor, seit 1980 in Betrieb.',q:'Nasi Lemak Alor Corner Kuala Lumpur',food:1},
+   {id:'kl21',t:'Cafés in Chinatown (Merchants Lane, Mingle)',n:'Kurz vom Petaling Street Markt entfernt. Aesthetic-Cafés, die in Lemon8 und TikTok oft vorkommen.',q:'Merchants Lane Kuala Lumpur',viral:1},
+   {id:'kl22',t:'Zhongshan Building und REXKL',n:'Umgebaute historische Gebäude mit kleinen Läden, Büchern und Kunst. Weniger touristisch.',q:'REXKL Kuala Lumpur',in:1},
+   {id:'kl23',t:'Matcha und Dessert-Café-Hopping',n:'Desserts sind in KL ein Social-Media-Thema: Cheevit Cheeva (Chow Kit), Niko Neko Matcha (Bangsar), Tim\'s Tea House.',q:'Cheevit Cheeva Chow Kit Kuala Lumpur',food:1,viral:1}
  ],
  lgk:[
   {id:'lg1',t:'SkyCab und SkyBridge',n:'SkyBridge 4,7, SkyCab 4,5. Täglich ab 9:30 Uhr. Bei klarem Himmel hingehen.',q:'Langkawi SkyCab',top:1},
@@ -588,7 +595,15 @@ var MUST={
    {id:'lg8',t:'Ikan Bakar und Meeresfrüchte',n:'Gegrillter Fisch mit Sambal, ein lokaler Favorit. Meeresfrüchte zum Beispiel im Orkid Ria Seafood.',q:'Orkid Ria Seafood Restaurant Langkawi',top:1,food:1},
    {id:'lg9',t:'Nasi Lemak und Roti zum Frühstück',n:'Nasi Lemak zum Mitnehmen. Roti am besten vor 9:30 Uhr holen, dann ist sie oft aus.',q:'Nasi lemak Langkawi',food:1},
    {id:'lg10',t:'Frische Kokosnuss am Strand',n:'Das Wasser bleibt in der dicken Schale kühl. Gibt es an Ständen am Strand.',q:'Young coconut Pantai Cenang Langkawi',drink:1},
-   {id:'lg11',t:'Krabben im Wonderland Seafood',n:'In Kuah. Auf Burpple als Tipp für Krabben auf Langkawi genannt.',q:'Wonderland Seafood Restaurant Kuah Langkawi',food:1}
+   {id:'lg11',t:'Krabben im Wonderland Seafood',n:'In Kuah. Auf Burpple als Tipp für Krabben auf Langkawi genannt.',q:'Wonderland Seafood Restaurant Kuah Langkawi',food:1},
+   {id:'lg12',t:'Laksa Ikan Sekoq',n:'Laksa auf Fischbasis, dazu Rojak, Cucur Udang und Pasembur. Wird in Langkawi-Food-Blogs empfohlen.',q:'Laksa Ikan Sekoq Langkawi',food:1},
+   {id:'lg13',t:'Nasi Dagang Pak Malau',n:'Frühstücksklassiker, etwa RM 10 pro Teller, mit Reisfeldblick. Nur morgens hingehen.',q:'Nasi Dagang Pak Malau Langkawi',food:1,top:1},
+   {id:'lg14',t:'Kak Yan Nasi Campur',n:'Reis mit vielen Beilagen zum Mittagessen, bei Einheimischen und Touristen beliebt. 9 bis 16 Uhr.',q:'Kak Yan Nasi Campur Langkawi',food:1},
+   {id:'lg15',t:'Nachtmärkte: Kuah und Cenang',n:'Laut Reiseblog Mittwoch Kuah, Donnerstag Cenang. Satay, Murtabak, Säfte. Nur Bargeld, Tage vor Ort prüfen.',q:'Pasar Malam Pantai Cenang Langkawi',food:1},
+   {id:'lg16',t:'Tanjung Rhu Strand',n:'Wird als sauberster Strand der Insel beschrieben, ruhig und im Norden.',q:'Tanjung Rhu Beach Langkawi'},
+   {id:'lg17',t:'Kilim Geoforest: Mangroven und Kajak',n:'Mangrovenwälder im Geopark, am besten als geführte Tour.',q:'Kilim Karst Geoforest Park Langkawi'},
+   {id:'lg18',t:'Telaga Tujuh und Durian Perangin',n:'Zwei Wasserfälle zum Baden, Durian Perangin ist frei zugänglich.',q:'Telaga Tujuh Waterfall Langkawi'},
+   {id:'lg19',t:'Gelato und Strandcafés in Cenang',n:'Yellow Beach Café, Gelato Cabana (ca. RM 5 pro Kugel).',q:'Yellow Beach Cafe Pantai Cenang',drink:1}
  ],
  hkt:[
   {id:'hk1',t:'Phi Phi Inseln und Maya Bay',n:'Rund 1,5 Stunden Bootsfahrt. Ganztagesausflug, früh buchen.',q:'Phi Phi Islands tour Phuket',top:1},
@@ -606,6 +621,11 @@ var MUST={
    {id:'hk13',t:'Cha Yen (Thai Iced Tea)',n:'Oranger Eistee mit Kondensmilch, überall zu haben, etwa 40 bis 80 Baht.',q:'Thai iced tea Phuket Old Town',top:1,drink:1},
    {id:'hk14',t:'Butterfly Pea Lemonade',n:'Blauer Blütentee, der mit Limette lila wird. Beliebt im Süden und auf den Inseln.',q:'Butterfly pea lemonade Phuket',drink:1},
    {id:'hk16',t:'Ah-Pong-Crêpes bei Mae Sunee',n:'In einer Michelin-Liste für Strassenküche in Phuket genannt.',q:'A Pong Mae Sunee Phuket',food:1},
+   {id:'hk17',t:'Kor Ra Kang Café (Thalang Road)',n:'Café voller rosa Blumen in der Altstadt, vor allem fürs Foto. Essen laut Bericht gemischt.',q:'Kor Ra Kang Cafe Phuket Old Town',viral:1},
+   {id:'hk18',t:'Promthep Cape bei Sonnenuntergang',n:'Der bekannteste Sonnenuntergangs-Spot der Insel. Früh kommen, es wird voll.',q:'Promthep Cape Phuket',top:1},
+   {id:'hk19',t:'Ao Sane Strand',n:'Kleiner, ruhiger Strand nahe Nai Harn. Morgens am leersten.',q:'Ao Sane Beach Phuket'},
+   {id:'hk20',t:'Black Rock Viewpoint',n:'Aussichtspunkt, der in Reiseberichten als Geheimtipp genannt wird.',q:'Black Rock Viewpoint Phuket'},
+   {id:'hk21',t:'Phuket Beach Clubs',n:'Beliebt für Sonnenuntergang und Drinks. Yona ist ein neuer, schwimmender Beach Club.',q:'Yona floating beach club Phuket',drink:1},
    {id:'hk15',t:'Kokosnuss und Zuckerrohrsaft (Nam Oi)',n:'Beides frisch am Strassenstand, gut kalt und mit Eis.',q:'Sugarcane juice Phuket Old Town',drink:1}
  ],
  bkk:[
@@ -627,7 +647,14 @@ var MUST={
    {id:'bk16',t:'Nom Yen (rosa Milch)',n:'Eiskalte rosa Milch mit Sala-Sirup, ein Thai-Klassiker.',q:'Nom Yen Bangkok',drink:1},
    {id:'bk17',t:'Butterfly Pea mit Limette',n:'Der blaue Drink wird mit Limette violett. Ca. 30 bis 60 Baht, auf Nachtmärkten.',q:'Butterfly pea lemonade Bangkok',drink:1},
    {id:'bk18',t:'Banthat Thong Road',n:'2026 viel auf Social Media. Michelin-Nudeln, TikTok-Desserts und alte Thai-chinesische Gerichte auf einem Kilometer.',q:'Banthat Thong Road Bangkok',top:1,food:1,viral:1},
-   {id:'bk19',t:'Heisser Toast aus dem 7-Eleven',n:'Ein TikTok-Video im Januar 2026 machte den Schinken-Käse-Toast bei Touristen bekannt.',q:'7-Eleven Bangkok',food:1,viral:1}
+   {id:'bk19',t:'Heisser Toast aus dem 7-Eleven',n:'Ein TikTok-Video im Januar 2026 machte den Schinken-Käse-Toast bei Touristen bekannt.',q:'7-Eleven Bangkok',food:1,viral:1},
+   {id:'bk20',t:'Talat Noi',n:'Altes Viertel neben Chinatown: Street Art, enge Gassen, Cafés. Mother Roaster (Café in einer alten Garage) und Hong Sieng Kong am Fluss.',q:'Talat Noi Bangkok',top:1,viral:1},
+   {id:'bk21',t:'Song Wat Road',n:'Restaurierte Shophouses. Time Out schreibt, TikTok-Cafés und Familienbetriebe stehen hier nebeneinander.',q:'Song Wat Road Bangkok',viral:1},
+   {id:'bk22',t:'Swing Bar (Rooftop)',n:'Rooftop-Bar mit Blick auf Giant Swing und Chinatown.',q:'Swing Bar Bangkok',drink:1},
+   {id:'bk23',t:'Nai Ek Rollnudeln',n:'Rollnudeln in Chinatown, in einem Blog als Essenstipp genannt.',q:'Nai Ek Roll Noodle Bangkok',food:1},
+   {id:'bk24',t:'Talad Rod Fai Srinakarin',n:'Vintage-Nachtmarkt mit Oldtimern, Secondhand und Streetfood. Wird in Reiseführern als Geheimtipp genannt.',q:'Talad Rod Fai Srinakarin Bangkok',food:1},
+   {id:'bk25',t:'Oontang Khao Soi (Ari)',n:'Laut Blog TikTok-bekannt. Ari ist das Café-Viertel, in der Nähe vom Chatuchak.',q:'Oontang Ari Bangkok',food:1,viral:1},
+   {id:'bk26',t:'Mama Tom Yum Nudeln',n:'Instant-Nudeln als Tom Yum mit Meeresfrüchten, Ei und Fleischbällchen. Bei Hype Malaysia als viral genannt.',q:'Mama Tom Yum Noodles Bangkok',food:1,viral:1}
  ]
 };
 // Ideen im Hinzufügen-Tab ergänzen
@@ -1431,6 +1458,9 @@ if(DEMO.live){
 setTimeout(function(){applyNet();if(!DEMO.live)liveAll();},600);
 setInterval(function(){if(!DEMO.live)liveAll();},600000);
 })();
+document.addEventListener('gesturestart',function(e){e.preventDefault()});
+document.addEventListener('gesturechange',function(e){e.preventDefault()});
+(function(){var t=0;document.addEventListener('touchend',function(e){var n=Date.now();if(n-t<350)e.preventDefault();t=n;},{passive:false});})();
 </script>
 </body>
 </html>
