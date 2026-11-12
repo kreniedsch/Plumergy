@@ -62,7 +62,7 @@ h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance}
 .mc .mn{width:30px;height:30px;border-radius:10px;background:var(--g);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:14px}
 .mc .mcity{font-size:12px;font-weight:800;color:var(--c);text-transform:uppercase;letter-spacing:.06em}
 .mtag{border-radius:99px;padding:3px 9px;font-size:11.5px;font-weight:800;background:var(--soft);color:var(--ink2)}
-.mtag.hot{background:linear-gradient(135deg,#FF8A00,#E83A5F);color:#fff}.mtag.rain{background:var(--okbg);color:var(--ok)}
+.mtag.food{background:#FFF1D6;color:#8A5200}.mtag.hot{background:linear-gradient(135deg,#FF8A00,#E83A5F);color:#fff}.mtag.rain{background:var(--okbg);color:var(--ok)}
 .mb{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
 .mbtn{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:9px 12px;font-weight:800;font-size:13.5px;color:var(--ink);text-decoration:none}
 .mbtn.on{background:var(--ok);border-color:var(--ok);color:#fff}
@@ -565,7 +565,12 @@ var MUST={
   {id:'kl4',t:'Aquaria KLCC',n:'Bewertung 4,5. Gut bei Regen.',q:'Aquaria KLCC',in:1},
   {id:'kl5',t:'KL Tower (Aussichtsdeck)',n:'Etwa RM 50 bis 100 je nach Paket, täglich 9 bis 22 Uhr.',q:'Menara Kuala Lumpur',in:1},
   {id:'kl6',t:'Jalan Alor Streetfood',n:'Abends in Bukit Bintang.',q:'Jalan Alor'},
-  {id:'kl7',t:'Sunway Lagoon',n:'Wasser- und Themenpark, Bewertung 4,7. Eigener Tagesausflug.',q:'Sunway Lagoon'}
+  {id:'kl7',t:'Sunway Lagoon',n:'Wasser- und Themenpark, Bewertung 4,7. Eigener Tagesausflug.',q:'Sunway Lagoon'},
+   {id:'kl8',t:'Chinatown und Petaling Street',n:'Markt unter dem grünen Dach, abends Streetfood. Central Market und Tempel liegen in der Nähe.',q:'Petaling Street',top:1},
+   {id:'kl9',t:'Nasi Lemak probieren',n:'Malaysias Nationalgericht: Kokosreis mit Sambal. Bekannt: Village Park (Damansara) und Nasi Lemak Wanjo (Kampung Baru).',q:'Village Park Restaurant Damansara',top:1,food:1},
+   {id:'kl10',t:'Char Kway Teow',n:'Wok-Nudeln mit Garnelen und Ei, mit Raucharoma. Bekannt: Meng Kee. Gibt es auch auf der Jalan Alor.',q:'Restoran Meng Kee Grill Fish',top:1,food:1},
+   {id:'kl11',t:'Hokkien Mee bei Kim Lian Kee',n:'Dicke Nudeln in dunkler Sojasauce, ein KL-Klassiker (ab etwa RM 14).',q:'Kim Lian Kee Kuala Lumpur',food:1},
+   {id:'kl12',t:'Cendol und Ais Kacang',n:'Eisdessert gegen die Hitze, steht auf fast jeder Hawker-Liste.',q:'Cendol Petaling Street',food:1}
  ],
  lgk:[
   {id:'lg1',t:'SkyCab und SkyBridge',n:'SkyBridge 4,7, SkyCab 4,5. Täglich ab 9:30 Uhr. Bei klarem Himmel hingehen.',q:'Langkawi SkyCab',top:1},
@@ -574,7 +579,9 @@ var MUST={
   {id:'lg4',t:'Underwater World Langkawi',n:'Bewertung 4,6, täglich 10 bis 22 Uhr. Gut bei Regen.',q:'Underwater World Langkawi',in:1},
   {id:'lg5',t:'Nachtmarkt (Pasar Malam)',n:'Streetfood und Handwerk, wechselt nach Wochentag.',q:'Pasar Malam Langkawi'},
   {id:'lg6',t:'Oriental Village',n:'Bewertung 4,3, Eingang zur SkyCab.',q:'Oriental Village Langkawi'},
-  {id:'lg7',t:'Eagle Square und Sonnenuntergang am Strand',n:'Kostenlos, abends am schönsten.',q:'Dataran Lang Langkawi'}
+  {id:'lg7',t:'Eagle Square und Sonnenuntergang am Strand',n:'Kostenlos, abends am schönsten.',q:'Dataran Lang Langkawi'},
+   {id:'lg8',t:'Ikan Bakar und Meeresfrüchte',n:'Gegrillter Fisch mit Sambal, ein lokaler Favorit. Meeresfrüchte zum Beispiel im Orkid Ria Seafood.',q:'Orkid Ria Seafood Restaurant Langkawi',top:1,food:1},
+   {id:'lg9',t:'Nasi Lemak und Roti zum Frühstück',n:'Nasi Lemak zum Mitnehmen. Roti am besten vor 9:30 Uhr holen, dann ist sie oft aus.',q:'Nasi lemak Langkawi',food:1}
  ],
  hkt:[
   {id:'hk1',t:'Phi Phi Inseln und Maya Bay',n:'Rund 1,5 Stunden Bootsfahrt. Ganztagesausflug, früh buchen.',q:'Phi Phi Islands tour Phuket',top:1},
@@ -584,7 +591,11 @@ var MUST={
   {id:'hk5',t:'Bangla Road in Patong',n:'Lebhaftes Nachtleben, nichts für Kinder.',q:'Bangla Road Patong'},
   {id:'hk6',t:'Hanuman World Zipline',n:'14 Ziplines und 4 Hängebrücken im Regenwald.',q:'Hanuman World Phuket'},
   {id:'hk7',t:'Old Phuket Town und Dibuk Road',n:'Spaziergang durch die Altstadt.',q:'Old Phuket Town Dibuk Road'},
-  {id:'hk8',t:'Karon Viewpoint und Promthep Cape',n:'Sonnenuntergang und Aussicht.',q:'Karon Viewpoint Phuket'}
+  {id:'hk8',t:'Karon Viewpoint und Promthep Cape',n:'Sonnenuntergang und Aussicht.',q:'Karon Viewpoint Phuket'},
+   {id:'hk9',t:'Lard Yai Sunday Walking Street',n:'Nur sonntags, 16 bis 22 Uhr, also am 22. Nov. Streetfood in der Altstadt: Hokkien Mee, Satay, Mango Sticky Rice.',q:'Lard Yai Sunday Walking Street Phuket',top:1,food:1},
+   {id:'hk10',t:'Hokkien Mee bei Mee Ton Poe',n:'Phuket-Stil Hokkien Mee, seit 1946, gegenüber dem Clock Tower in der Altstadt.',q:'Mee Ton Poe Phuket',top:1,food:1},
+   {id:'hk11',t:'Mango Sticky Rice',n:'Zum Beispiel bei Mango Sticky Rice by Taling Pling oder im Mango Moment.',q:'Mango Moment Phuket',food:1},
+   {id:'hk12',t:'Moo Hong und Kanom Jeen',n:'Phuket-Spezialitäten: geschmortes Schweinefleisch (Moo Hong) und Reisnudeln mit Curry (Kanom Jeen).',q:'Phuket Old Town Moo Hong',food:1}
  ],
  bkk:[
   {id:'bk1',t:'Loy Krathong am Fluss',n:'Hauptnacht Di 24. Nov (einzelne Quellen: 25. Nov). Programm läuft 17. bis 29. Nov, am Mahakan Fort 23. bis 25. Nov.',q:'Mahakan Fort Bangkok',top:1},
@@ -595,7 +606,12 @@ var MUST={
   {id:'bk6',t:'Chao Phraya Dinner Cruise',n:'Besser vorab buchen.',q:'Chao Phraya dinner cruise Bangkok'},
   {id:'bk7',t:'ICONSIAM Riverfront',n:'Grosse Mall am Fluss, gut bei Regen.',q:'ICONSIAM Bangkok',in:1},
   {id:'bk8',t:'Cave Fantasy VR im MBK Center',n:'Im Januar 2026 eröffnet, VR-Achterbahn im 4. Stock.',q:'MBK Center Bangkok',in:1},
-  {id:'bk9',t:'Benjakitti Park und Rooftop Bar',n:'Park beim BTS Asok, abends Aussicht von einer Rooftop Bar.',q:'Benjakitti Park Bangkok'}
+  {id:'bk9',t:'Benjakitti Park und Rooftop Bar',n:'Park beim BTS Asok, abends Aussicht von einer Rooftop Bar.',q:'Benjakitti Park Bangkok'},
+   {id:'bk10',t:'Pad Thai bei Thipsamai',n:'Einer der bekanntesten Pad-Thai-Läden. Ab 17 Uhr, mit Schlange rechnen.',q:'Thipsamai Pad Thai Bangkok',top:1,food:1},
+   {id:'bk11',t:'Krabben-Omelett bei Jay Fai',n:'Berühmtes Streetfood-Restaurant, sehr beliebt. Mit Wartezeit rechnen.',q:'Jay Fai Bangkok',top:1,food:1},
+   {id:'bk12',t:'Mango Sticky Rice bei Mae Varee',n:'In Thonglor an der Sukhumvit Soi 55, als Takeaway-Box.',q:'Mae Varee Thonglor Bangkok',top:1,food:1},
+   {id:'bk13',t:'Boat Noodles',n:'Kleine Schalen mit kräftiger Brühe, deshalb gleich mehrere bestellen. Bekannt: Kuay Teow Nai Buem.',q:'Kuay Teow Nai Buem Bangkok',food:1},
+   {id:'bk14',t:'Train Night Market Srinagarindra',n:'Grosser Nachtmarkt mit Dim Sum und Streetfood.',q:'Train Night Market Srinagarindra',food:1}
  ]
 };
 // Ideen im Hinzufügen-Tab ergänzen
@@ -899,7 +915,7 @@ var mustCity='all';
 function mustPlanDate(seg){var st=seg.stayObjs[0];return addDays(st.ci,1)<=seg.stayObjs[seg.stayObjs.length-1].co?addDays(st.ci,1):st.ci;}
 function mustCard(m,seg,rank,rainy){
   var d=mustDone(m.id),c=seg.color;
-  var tags=(m.top?'<span class="mtag hot">Must do</span>':'')+(m.in?'<span class="mtag">drinnen</span>':'')+(rainy&&m.in&&!d?'<span class="mtag rain">Regen-Tipp</span>':'');
+  var tags=(m.top?'<span class="mtag hot">Must do</span>':'')+(m.food?'<span class="mtag food">Essen</span>':'')+(m.in?'<span class="mtag">drinnen</span>':'')+(rainy&&m.in&&!d?'<span class="mtag rain">Regen-Tipp</span>':'');
   var map='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(m.q+' '+seg.city);
   return '<article class="mc'+(d?' done':'')+'" style="--c:'+c+';--g:'+seg.g+'"><div class="mh"><span class="mn">'+rank+'</span><span class="mcity">'+esc(seg.city)+'</span>'+tags+'</div>'+
    '<h3>'+esc(m.t)+'</h3><p>'+esc(m.n)+'</p>'+
