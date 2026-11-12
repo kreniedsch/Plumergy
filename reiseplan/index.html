@@ -516,7 +516,7 @@ var F=[
  {id:'f1',no:'QR96',from:'ZRH',to:'DOH',air:'Qatar Airways',lk:['Gepäckregeln','https://www.qatarairways.com/en/baggage.html'],d:'2026-11-13',dt:'15:10',dz:'+01:00',a:'2026-11-13',at:'22:50',az:'+03:00',stops:0,bag:'25 kg Aufgabegepäck',cls:'Economy'},
  {id:'f2',no:'QR4991',from:'DOH',to:'KUL',air:'Qatar Airways',lk:['Qatar Gepäckregeln','https://www.qatarairways.com/en/baggage.html'],lk2:['Malaysia Airlines','https://www.malaysiaairlines.com'],op:'Malaysia Airlines',d:'2026-11-14',dt:'01:30',dz:'+03:00',a:'2026-11-14',at:'14:05',az:'+08:00',stops:0,bag:'25 kg Aufgabegepäck',cls:'Economy',extra:'Terminal 1'},
  {id:'f3',no:'',from:'KUL',to:'LGK',air:'Malaysia Airlines',d:'2026-11-17',dt:'13:00',dz:'+08:00',a:'2026-11-17',at:'14:05',az:'+08:00',stops:0,price:129,bag:'20 kg Aufgabegepäck',hand:'7 kg Handgepäck + Rucksack',lk:['Malaysia Airlines','https://www.malaysiaairlines.com']},
- {id:'f4',no:'',from:'LGK',to:'HKT',air:'Malaysia Airlines',d:'2026-11-20',dt:'14:45',dz:'+08:00',a:'2026-11-20',at:'17:35',az:'+07:00',stops:1,price:561.77,bag:'20 kg Aufgabegepäck',hand:'7 kg Handgepäck + Rucksack',lk:['Malaysia Airlines','https://www.malaysiaairlines.com']},
+ {id:'f4',no:'MH1437',no2:'MH790',via:{ap:'KUL',arr:'16:05',dep:'17:05',az:'+08:00'},from:'LGK',to:'HKT',air:'Malaysia Airlines',d:'2026-11-20',dt:'14:45',dz:'+08:00',a:'2026-11-20',at:'17:35',az:'+07:00',stops:1,price:561.77,bag:'20 kg Aufgabegepäck',hand:'7 kg Handgepäck + Rucksack',lk:['Malaysia Airlines','https://www.malaysiaairlines.com']},
  {id:'f5',no:'',from:'HKT',to:'BKK',air:'Bangkok Airways',d:'2026-11-23',dt:'15:00',dz:'+07:00',a:'2026-11-23',at:'16:35',az:'+07:00',stops:0,price:267.69,bag:'Gepäck prüfen',lk:['Bangkok Airways','https://www.bangkokair.com']},
  {id:'f6',no:'QR837',from:'BKK',to:'DOH',air:'Qatar Airways',lk:['Gepäckregeln','https://www.qatarairways.com/en/baggage.html'],d:'2026-11-27',dt:'02:00',dz:'+07:00',a:'2026-11-27',at:'04:55',az:'+03:00',stops:0,bag:'25 kg Aufgabegepäck',cls:'Economy'},
  {id:'f7',no:'QR95',from:'DOH',to:'ZRH',air:'Qatar Airways',lk:['Gepäckregeln','https://www.qatarairways.com/en/baggage.html'],d:'2026-11-27',dt:'09:30',dz:'+03:00',a:'2026-11-27',at:'13:40',az:'+01:00',stops:0,bag:'25 kg Aufgabegepäck',cls:'Economy'}
@@ -852,7 +852,7 @@ function wxHTML(id){
   var days=(w.days||[]).slice(0,3).map(function(d){return '<span class="wd"><b>'+esc(String(d.d||''))+'</b>'+esc(String(d.hi))+'° / '+esc(String(d.lo))+'°<i>'+esc(String(d.rain))+'%</i></span>';}).join('');
   return '<div class="wx"><div class="wn"><strong>'+esc(String(w.t))+'°</strong><span>'+esc(String(w.txt||''))+'</span></div><div class="wr">Regen '+esc(String(w.rain))+'%'+(w.hum?' · Luft '+esc(String(w.hum))+'%':'')+'</div>'+(days?'<div class="wds">'+days+'</div>':'')+'<small>Live vor Ort · '+(LIVE.updated?ago(LIVE.updated):'')+' · Daten: Open-Meteo.com (CC BY 4.0)</small></div>';
 }
-function liveFlight(f){return LIVE&&LIVE.flights&&LIVE.flights[f.no||(f.from+f.to)]||null;}
+function liveFlight(f){var L=LIVE&&LIVE.flights;if(!L)return null;var a=L[f.no||(f.from+f.to)]||null,b=f.no2?L[f.no2]:null;return b&&(!a||a.s==='ok')?b:a;}
 function fsChip(f){
   var l=liveFlight(f);if(!l)return '';
   var c=l.s==='cancel'?'bad':l.s==='delay'?(l.min>=60?'bad':'warn'):'ok';
@@ -1009,6 +1009,7 @@ function prepCard(){
 function flightCard(f){
   var d=f.arrT-f.depT,dz=parseInt(f.az,10)-parseInt(f.dz,10),tags=[];
   tags.push('<span class="tag">'+(f.stops?f.stops+' Zwischenstopp':'Direkt')+'</span>');
+  if(f.via){var vm=Math.round((inst(f.d,f.via.dep,f.via.az)-inst(f.d,f.via.arr,f.via.az))/6e4);tags.push('<span class="tag" style="background:#FFF1D6;color:#8A5200">Umstieg in '+esc(APC[f.via.ap])+': '+vm+' Min, knapp</span>');}
   if(f.cls)tags.push('<span class="tag">'+f.cls+'</span>');
   if(f.bag)tags.push('<span class="tag">'+esc(f.bag)+'</span>');
   if(f.hand)tags.push('<span class="tag">'+esc(f.hand)+'</span>');
@@ -1018,7 +1019,7 @@ function flightCard(f){
   if(f.lk)tags.push('<a class="lk" href="'+f.lk[1]+'" target="_blank" rel="noopener">'+esc(f.lk[0])+' ↗</a>');
   if(f.lk2)tags.push('<a class="lk" href="'+f.lk2[1]+'" target="_blank" rel="noopener">'+esc(f.lk2[0])+' ↗</a>');
   var nextDay=f.a>f.d?' <small>+1</small>':'';
-  return '<article class="card fl"><div class="meta"><span>Flug '+esc(f.no||f.air)+(f.no?' · '+esc(f.air)+(f.op?' / '+esc(f.op):''):'')+'</span><span class="d">'+dLabel(f.d)+'</span></div>'+
+  return '<article class="card fl"><div class="meta"><span>Flug '+esc(f.no||f.air)+(f.no2?' + '+esc(f.no2):'')+(f.no?' · '+esc(f.air)+(f.op?' / '+esc(f.op):''):'')+'</span><span class="d">'+dLabel(f.d)+'</span></div>'+
    '<div class="legs"><div><div class="time">'+f.dt+'</div><div class="ap">'+f.from+'</div><div class="cy">'+esc(APC[f.from])+'</div></div>'+
    '<div class="mid"><div class="ln">'+ico('plane',18)+'</div><span>'+dur(d)+'</span>'+(dz?'<span style="font-weight:500;color:var(--muted)">'+(dz>0?'+':'')+dz+' Std Zeit</span>':'')+'</div>'+
    '<div class="r"><div class="time">'+f.at+nextDay+'</div><div class="ap">'+f.to+'</div><div class="cy">'+esc(APC[f.to])+'</div></div></div>'+
@@ -1360,7 +1361,7 @@ function loadWx(){
     else setLiveInfo('Wetter konnte nicht abgerufen werden. Hier ist das Abrufen evtl. gesperrt oder du bist offline.');
   });
 }
-var FLN=[['QR96','QR96','2026-11-13'],['QR4991','QR4991','2026-11-14'],['QR837','QR837','2026-11-27'],['QR95','QR95','2026-11-27']];
+var FLN=[['QR96','QR96','2026-11-13'],['QR4991','QR4991','2026-11-14'],['QR837','QR837','2026-11-27'],['QR95','QR95','2026-11-27'],['MH1437','MH1437','2026-11-20'],['MH790','MH790','2026-11-20']];
 function loadFlights(){
   var key='';try{key=localStorage.getItem(LS_FK)||'';}catch(e){}
   if(!key||typeof fetch!=='function')return Promise.resolve();
