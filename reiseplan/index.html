@@ -919,6 +919,20 @@ function fsChip(f){
   var t=l.s==='cancel'?'Gestrichen':l.s==='delay'?'Verspätung '+l.min+' Min':l.s==='early'?'Früher: '+(l.min||0)+' Min':'Pünktlich';
   return '<div class="fs '+c+'"><b>'+t+'</b>'+(l.new?' · neu '+esc(l.new):'')+(l.gate?' · Gate '+esc(l.gate):'')+(l.note?'<span>'+esc(l.note)+'</span>':'')+'<small>Live · '+(LIVE.updated?ago(LIVE.updated):'')+'</small></div>';
 }
+var APXY={ZRH:[47.4647,8.5492],DOH:[25.2731,51.6081],KUL:[2.7456,101.7099],LGK:[6.3297,99.7287],HKT:[8.1132,98.3169],BKK:[13.69,100.7501]};
+function kmBetween(a,b){var R=6371,r=Math.PI/180,dl=(b[0]-a[0])*r,dn=(b[1]-a[1])*r,x=Math.sin(dl/2)*Math.sin(dl/2)+Math.cos(a[0]*r)*Math.cos(b[0]*r)*Math.sin(dn/2)*Math.sin(dn/2);return 2*R*Math.asin(Math.sqrt(x));}
+function radarChip(f){
+  if(typeof liveNet==='undefined'||!liveNet.radar)return '';
+  var now=Date.now();if(now<f.depT-2*H||now>f.arrT+H)return '';
+  var r=liveNet.radar[f.id];
+  if(!r||!r.found){return (r&&now-r.t<15*6e4)?'<div class="fs"><b>Radar</b><span>Noch kein Signal. Der Flug ist am Boden oder gerade ausser Reichweite der Empfänger (über dem Meer normal).</span><small>Geprüft '+ago(r.t)+'</small></div>':'';}
+  if(now-r.t>15*6e4)return '';
+  var tot=kmBetween(APXY[f.from],APXY[f.to]),left=kmBetween([r.lat,r.lon],APXY[f.to]),pct=Math.max(0,Math.min(100,Math.round((1-left/tot)*100)));
+  var st=r.ground?'Am Boden':'In der Luft';
+  var info=(r.ground?'':fmtN(r.alt)+' m · '+fmtN(r.gs)+' km/h · ')+(r.type?esc(r.type)+(r.reg?' '+esc(r.reg):'')+' · ':'')+'noch '+fmtN(left)+' km bis '+esc(APC[f.to]);
+  return '<div class="fs ok"><b>Live-Radar: '+st+'</b><span>'+info+'</span><div style="height:6px;border-radius:6px;background:#0001;margin:8px 0 2px;overflow:hidden"><div style="width:'+pct+'%;height:100%;background:var(--ok,#0C9E92)"></div></div><small>'+pct+' % der Strecke · '+ago(r.t)+'</small></div>';
+}
+function fmtN(n){return Math.round(n).toLocaleString('de-CH');}
 function liveBanner(){
   if(!LIVE||!LIVE.flights)return '';
   var bad=F.filter(function(f){var l=liveFlight(f);return l&&(l.s==='cancel'||(l.s==='delay'&&l.min>=30));});
@@ -1101,7 +1115,7 @@ function flightCard(f){
    '<div class="legs"><div><div class="time">'+f.dt+'</div><div class="ap">'+f.from+'</div><div class="cy">'+esc(APC[f.from])+'</div></div>'+
    '<div class="mid"><div class="ln">'+ico('plane',18)+'</div><span>'+dur(d)+'</span>'+(dz?'<span style="font-weight:500;color:var(--muted)">'+(dz>0?'+':'')+dz+' Std Zeit</span>':'')+'</div>'+
    '<div class="r"><div class="time">'+f.at+nextDay+'</div><div class="ap">'+f.to+'</div><div class="cy">'+esc(APC[f.to])+'</div></div></div>'+
-   '<div class="tags">'+tags.join('')+'</div>'+fsChip(f)+'</article>';
+   '<div class="tags">'+tags.join('')+'</div>'+fsChip(f)+radarChip(f)+'</article>';
 }
 function layover(a,b){
   var ms=b.depT-a.arrT,st=ms<90*6e4?'bad':ms>5*H?'':'ok',lab=ms<90*6e4?'Knapp':ms>5*H?'Lang':'Gut';
@@ -1458,7 +1472,39 @@ function loadFlights(){
     }).catch(function(){});
   })).then(function(){liveNet.updated=Date.now();applyNet();var el=$('#fkeyInfo');if(el)el.textContent='Flugstatus geprüft '+ago(liveNet.updated)+'.';});
 }
-function liveAll(){return loadWx().then(loadFlights);}
+var RCS={QR:'QTR',MH:'MAS',PG:'BKP'};
+function radarCalls(f){
+  var out=[];[f.no,f.no2].forEach(function(n){var m=n&&/^([A-Z0-9]{2})(\d+)$/.exec(n);if(m)out.push((RCS[m[1]]||m[1])+m[2]);});
+  if(f.id==='f2')out.push('MAS161'); // QR4991 wird von Malaysia Airlines geflogen
+  return out;
+}
+function radarFetch(cs){
+  var urls=['https://api.adsb.lol/v2/callsign/'+cs,'https://api.airplanes.live/v2/callsign/'+cs];
+  function go(i){
+    if(i>=urls.length)return Promise.resolve(null);
+    return fetch(urls[i]).then(function(r){if(!r.ok)throw new Error('http');return r.json();}).then(function(j){
+      var ac=(j&&(j.ac||j.aircraft))||[];
+      return ac.filter(function(a){return a&&typeof a.lat==='number'&&typeof a.lon==='number';})[0]||'none';
+    }).catch(function(){return go(i+1);});
+  }
+  return go(0);
+}
+function loadRadar(){
+  if(typeof fetch!=='function')return Promise.resolve();
+  var now=Date.now(),act=F.filter(function(f){return radarCalls(f).length&&now>=f.depT-2*H&&now<=f.arrT+H;});
+  if(!act.length)return Promise.resolve();
+  liveNet.radar=liveNet.radar||{};
+  return Promise.all(act.map(function(f){
+    return Promise.all(radarCalls(f).map(radarFetch)).then(function(rs){
+      var a=rs.filter(function(x){return x&&x!=='none';})[0];
+      if(a){var g=a.alt_baro==='ground';liveNet.radar[f.id]={found:1,t:Date.now(),lat:a.lat,lon:a.lon,ground:g,alt:g?0:(Number(a.alt_baro)||Number(a.alt_geom)||0)*0.3048,gs:(Number(a.gs)||0)*1.852,type:a.t||'',reg:a.r||''};}
+      else if(rs.some(function(x){return x==='none';}))liveNet.radar[f.id]={found:0,t:Date.now()};
+    });
+  })).then(function(){renderAll();});
+}
+setInterval(function(){try{loadRadar();}catch(e){}},60000);
+setTimeout(function(){try{loadRadar();}catch(e){}},3000);
+function liveAll(){return loadWx().then(loadFlights).then(loadRadar);}
 try{var lc=JSON.parse(localStorage.getItem(LS_KEY)||'null');if(lc&&lc.weather){liveNet=lc;liveNet.flights=lc.flights||{};}}catch(e){}
 document.addEventListener('click',function(e){
   var t=e.target;if(!t||!t.id)return;
