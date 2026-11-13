@@ -433,6 +433,84 @@ h1,h2,h3{font-weight:500}
 .stp{border-radius:4px;font-weight:600}
 .trow .tt{font-weight:600}
 .mchip.on{background:var(--c,var(--night));border-color:var(--c,var(--night));color:var(--ivory)}
+
+/* ===== V2 Struktur: Pass, Tagesstreifen, Wallet ===== */
+.vip{background:radial-gradient(130% 90% at 90% -20%,#1D4757 0,#0E242E 50%,#0A1A22 85%);color:var(--ivory);border-radius:22px;padding:22px 20px 0;box-shadow:0 34px 50px -30px rgba(5,15,20,.75);position:relative;overflow:hidden}
+.vip::before{content:"";position:absolute;inset:7px;border:1px solid rgba(200,169,107,.28);border-radius:16px;pointer-events:none}
+.vt{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.vw{font-family:var(--display);font-size:21px;font-weight:500;letter-spacing:.04em;color:var(--brassl)}
+.vm{font-size:12px;color:#9DB0B7;font-weight:500}
+.vg{font-family:var(--display);font-size:30px;line-height:1.15;margin-top:26px;font-weight:500;color:var(--ivory)}
+.vip .cd{margin-top:20px}
+.vperf{margin:22px -20px 0;border-top:1px dashed rgba(200,169,107,.45);position:relative;height:0}
+.vperf::before,.vperf::after{content:"";position:absolute;top:-10px;width:20px;height:20px;border-radius:50%;background:var(--bg)}
+.vperf::before{left:-10px}.vperf::after{right:-10px}
+.vn{padding:16px 0 22px}
+.vn small{color:var(--brassl);font-weight:500;font-size:12px;letter-spacing:.05em}
+.vr{display:flex;align-items:center;gap:12px;margin-top:6px}
+.vr b{font-family:var(--display);font-size:30px;font-weight:500;letter-spacing:.02em}
+.vl{flex:1;border-top:1px solid var(--brass);position:relative;height:0}
+.vl::after{content:"";position:absolute;right:0;top:-4px;width:7px;height:7px;border-top:1px solid var(--brass);border-right:1px solid var(--brass);transform:rotate(45deg)}
+.vs{color:#9DB0B7;font-size:13px;font-weight:500;margin-top:4px}
+
+.rail{display:flex;gap:6px;overflow-x:auto;scroll-snap-type:x proximity;padding:2px 2px 10px;margin:0 -16px;padding-left:16px;padding-right:16px;scrollbar-width:none}
+.rail::-webkit-scrollbar{display:none}
+.dy{flex:none;scroll-snap-align:center;width:52px;border:1px solid #D3D9D5;background:#fff;border-radius:12px;padding:9px 0 8px;display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--ink2)}
+.dy small{font-size:11.5px;font-weight:600;letter-spacing:.03em}
+.dy b{font-family:var(--display);font-size:22px;font-weight:500;line-height:1.1;color:var(--ink)}
+.dy i{display:block;width:16px;height:3px;border-radius:2px;background:var(--c);margin-top:4px}
+.dy.now small::after{content:" ·";color:var(--brass)}
+.dy.on{background:var(--night);border-color:var(--night);color:#9DB0B7}
+.dy.on b{color:var(--ivory)}.dy.on i{background:var(--brass)}
+.dayhead{background:linear-gradient(165deg,#0B1D26,#14363F);border-top:3px solid var(--c);border-radius:14px 14px 0 0;padding:18px 18px 18px;color:var(--ivory)}
+.dayhead small{color:var(--brassl);font-weight:500;font-size:12.5px;letter-spacing:.03em}
+.dayhead h2{font-size:30px;line-height:1.1;margin-top:4px;font-weight:500;color:var(--ivory)}
+.agenda{background:#fff;border-radius:0 0 14px 14px;padding:10px 16px 16px;box-shadow:0 0 0 1px rgba(11,27,36,.07),0 22px 32px -26px rgba(11,27,36,.45)}
+.ag{display:grid;grid-template-columns:54px 14px 1fr;gap:0 8px;align-items:start}
+.ag.past{opacity:.5}
+.at{font-family:var(--display);font-size:17px;font-weight:500;padding-top:12px;color:var(--ink);text-align:right;line-height:1.2}
+.ad{position:relative;align-self:stretch}
+.ad::before{content:"";position:absolute;left:6px;top:0;bottom:0;border-left:1px solid #CFD5D1}
+.ad i{position:absolute;left:2px;top:17px;width:9px;height:9px;border-radius:50%;background:#fff;border:1.5px solid var(--brass)}
+.ag:last-of-type .ad::before{bottom:auto;height:22px}
+.ab .rowi{border-bottom:0;padding:9px 0 10px}
+.ab .rowi.anchor .rt{color:var(--ink)}
+.dayhead .wx{margin-top:14px}
+.agenda .free{margin-top:10px}
+
+.wallet{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -16px;padding:4px 16px 16px;scrollbar-width:none}
+.wallet::-webkit-scrollbar{display:none}
+.pass{flex:none;width:min(86%,330px);scroll-snap-align:center;background:#FBF9F4;border-radius:16px;box-shadow:0 0 0 1px rgba(11,27,36,.08),0 26px 34px -24px rgba(11,27,36,.6);overflow:hidden;color:var(--ink)}
+.pb{background:var(--night);color:var(--brassl);display:flex;justify-content:space-between;align-items:baseline;padding:12px 16px;font-weight:500;font-size:13px}
+.pb b{font-family:var(--display);font-size:18px;color:var(--ivory);font-weight:500;letter-spacing:.03em}
+.pm{display:grid;grid-template-columns:1fr auto 1fr;gap:6px;align-items:center;padding:18px 16px 4px}
+.pc b{display:block;font-family:var(--display);font-size:36px;font-weight:500;line-height:1;letter-spacing:.01em}
+.pc span{display:block;font-size:12.5px;color:var(--muted);margin-top:4px}
+.pc em{display:block;font-style:normal;font-family:var(--display);font-size:22px;margin-top:10px}
+.pc.r{text-align:right}.pc em sup{font-size:11px;color:var(--brass)}
+.px{display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--ink2);min-width:64px}
+.px small{font-size:11.5px;font-weight:600}
+.pl{display:flex;align-items:center;width:100%;gap:4px;color:var(--brass)}
+.pl::before,.pl::after{content:"";flex:1;border-top:1px solid var(--brass)}
+.pd{padding:6px 16px 14px;font-size:12.5px;color:var(--ink2);font-weight:500}
+.pcut{display:flex;align-items:center;margin:0 -1px}
+.pcut i{flex:none;width:18px;height:18px;border-radius:50%;background:var(--bg);box-shadow:inset 0 0 0 1px rgba(11,27,36,.08)}
+.pcut i:first-child{margin-left:-9px}.pcut i:last-child{margin-right:-9px}
+.pcut b{flex:1;border-top:1.5px dashed #CFC6B0}
+.ps{padding:12px 16px 16px}
+.ps .tags{margin-top:0}.ps .tag{background:#EFEBE0}.ps .tag.warnt{background:var(--warnbg);color:var(--warn)}
+.plk{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.ps .fs{margin-top:10px}
+.ps .tags .tag.lkt{padding:0}
+.keyc{flex:none;width:min(78%,290px);scroll-snap-align:center;background:linear-gradient(165deg,#0B1D26,#14363F);color:var(--ivory);border-radius:16px;padding:18px 18px 16px;border-top:3px solid var(--c);box-shadow:0 26px 34px -24px rgba(5,15,20,.8);display:flex;flex-direction:column;gap:6px}
+.keyc small{color:var(--brassl);font-weight:500;font-size:12.5px}
+.keyc h3{font-size:21px;line-height:1.2;font-weight:500;color:var(--ivory)}
+.keyc .ka{font-size:13px;color:#9DB0B7}
+.kf{display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:14px;border-top:1px dashed rgba(200,169,107,.4)}
+.kf b{font-family:var(--display);font-weight:500;font-size:16px}
+.keyc .st.ok{background:transparent;border:1px solid rgba(200,169,107,.5);color:var(--brassl);border-radius:4px}
+.wallet{align-items:flex-start}.pass .fs svg{display:none}
+.pass .tags{row-gap:6px}
 @media (max-width:380px){.hero h1{font-size:38px}.fc .h b{font-size:38px}.fc{--h:66px}}
 </style>
 </head>
@@ -1366,21 +1444,95 @@ function hintsHTML(){
     return '<details class="hint k-'+h.k+'"><summary><span class="ib">'+ico(ic[h.k],17)+'</span><span class="t">'+esc(h.t)+'</span><span class="chev">'+ico('chev',18)+'</span></summary><div class="body">'+esc(h.b)+'</div></details>';
   }).join('');
 }
-function renderTimeline(){
-  var items=state.items,h=demoBanner()+heroHTML()+liveBanner()+todayHTML()+reminderHTML()+hintsHTML()+'<div class="sec">Timeline</div><div class="stream">';
-  h+=prepCard()+spacer();
-  var pre=miniBlock('pre','Vor dem Abflug',items);
-  if(pre)h+=pre+spacer();
-  h+=flightCard(F[0])+layover(F[0],F[1])+flightCard(F[1])+spacer();
-  h+=segCard(SEGS[0],items)+spacer()+flightCard(F[2])+spacer();
-  h+=segCard(SEGS[1],items)+spacer()+flightCard(F[3])+spacer();
-  h+=segCard(SEGS[2],items)+spacer()+flightCard(F[4])+spacer();
-  h+=segCard(SEGS[3],items)+spacer()+flightCard(F[5])+layover(F[5],F[6])+flightCard(F[6]);
-  var post=miniBlock('post','Nach der Landung',items);
-  if(post)h+=spacer()+post;
-  h+='</div>';
-  $('#tl').innerHTML=h;
+var vDay=null;
+var CNAME={zrh:'Zürich',kl:'Kuala Lumpur',lgk:'Langkawi',hkt:'Phuket',bkk:'Bangkok'};
+var DNAME={'2026-11-13':'Abreise ab Zürich','2026-11-14':'Ankunft in Kuala Lumpur','2026-11-17':'Weiter nach Langkawi','2026-11-20':'Weiter nach Phuket','2026-11-23':'Weiter nach Bangkok','2026-11-27':'Heimreise'};
+function cCol(c){return c==='kl'?SEGS[0].color:c==='lgk'?SEGS[1].color:c==='hkt'?SEGS[2].color:c==='bkk'?SEGS[3].color:'#5B6B73';}
+function stayTz(s){for(var i=0;i<SEGS.length;i++)if(SEGS[i].stays.indexOf(s.id)>=0)return SEGS[i].tz;return '+07:00';}
+function agendaEntries(d){
+  var E=[];
+  F.forEach(function(f){
+    if(f.d===d)E.push({key:f.depT,time:f.dt,e:{kind:'dep',f:f}});
+    if(f.a===d)E.push({key:f.arrT,time:f.at,e:{kind:'land',f:f}});
+  });
+  Object.keys(STAYS).forEach(function(k){var h=STAYS[k],tz=stayTz(h);
+    if(h.ci===d)E.push({key:inst(d,'15:00',tz),time:'15:00',e:{kind:'in',s:h}});
+    if(h.co===d)E.push({key:inst(d,'11:00',tz),time:'11:00',e:{kind:'out',s:h}});
+  });
+  Object.keys(TR).forEach(function(k){var t=TR[k];if(t.date===d)E.push({key:inst(t.date,t.time,t.tz)+1,time:t.time,e:{kind:'transfer',tr:t}});});
+  state.items.forEach(function(it){if(it.date!==d)return;var st=itStart(it);E.push({key:st!=null?st:inst(d,'00:05',itTz(it)),time:it.start||'Ganztägig',e:{kind:'item',it:it}});});
+  E.sort(function(a,b){return a.key-b.key;});
+  return E;
 }
+function agendaHTML(d){
+  var E=agendaEntries(d),c=defaultCity(d),n=nightsBetween(FIRST,d)+1,now=Date.now(),seg=SEGS.filter(function(x){return x.id===c;})[0];
+  var title=DNAME[d]||(CNAME[c]||'');
+  var h='<div class="dayhead" style="--c:'+cCol(c)+'"><div class="dhl"><small>Tag '+n+' von 15 · '+dLabel(d)+'</small><h2>'+esc(title)+'</h2></div>'+(seg?wxHTML(seg.id):'')+'</div>';
+  h+='<div class="agenda">';
+  if(!E.length)h+='<div class="empty">Für diesen Tag ist noch nichts geplant.</div>';
+  E.forEach(function(x){
+    var past=x.key<now;
+    h+='<div class="ag'+(past?' past':'')+'"><div class="at">'+esc(x.time)+'</div><div class="ad"><i></i></div><div class="ab">'+rowHTML(x.e)+'</div></div>';
+  });
+  h+='<button class="free" type="button" data-act="addday" data-date="'+d+'" data-city="'+c+'">Eintrag hinzufügen</button></div>';
+  return h;
+}
+function railHTML(){
+  var today=zrhDate(Date.now());
+  return '<div class="rail" id="rail" role="tablist" aria-label="Reisetage">'+range(FIRST,LAST).map(function(d){
+    var x=dObj(d),c=defaultCity(d);
+    return '<button type="button" class="dy'+(d===vDay?' on':'')+(d===today?' now':'')+'" data-day="'+d+'" role="tab" aria-selected="'+(d===vDay)+'" style="--c:'+cCol(c)+'"><small>'+WD[x.getUTCDay()]+'</small><b>'+x.getUTCDate()+'</b><i></i></button>';
+  }).join('')+'</div>';
+}
+function greet(){
+  var h=21;try{h=parseInt(new Intl.DateTimeFormat('de-CH',{hour:'numeric',hour12:false,timeZone:'Europe/Zurich'}).format(new Date(Date.now())),10);}catch(e){}
+  return h<5?'Gute Nacht':h<11?'Guten Morgen':h<17?'Guten Tag':'Guten Abend';
+}
+function vipHTML(){
+  var n=Date.now(),nx=null,i;for(i=0;i<F.length;i++){if(F[i].depT>n){nx=F[i];break;}}
+  var foot=nx?'<div class="vn"><small>Nächster Flug</small><div class="vr"><b>'+esc(nx.from)+'</b><span class="vl"></span><b>'+esc(nx.to)+'</b></div><div class="vs">'+esc(nx.no||nx.air)+' · '+dLabel(nx.d)+' · '+nx.dt+' bis '+nx.at+'</div></div>':'';
+  return '<section class="vip"><div class="vt"><span class="vw">Thaiysia</span><span class="vm">4 Gäste · 13. bis 27. Nov 2026</span></div><div class="vg">'+greet()+', Reniedsch</div>'+cdHTML()+'<div class="vperf"></div>'+foot+'</section>';
+}
+function passCard(f){
+  var d=f.arrT-f.depT,dz=parseInt(f.az,10)-parseInt(f.dz,10),tags=[];
+  tags.push('<span class="tag">'+(f.stops?f.stops+' Zwischenstopp':'Direkt')+'</span>');
+  if(f.via)tags.push('<span class="tag warnt">Umstieg '+esc(APC[f.via.ap])+' knapp</span>');
+  if(f.cls)tags.push('<span class="tag">'+esc(f.cls)+'</span>');
+  if(f.bag)tags.push('<span class="tag">'+esc(f.bag)+'</span>');
+  if(f.hand)tags.push('<span class="tag">'+esc(f.hand)+'</span>');
+  if(f.op)tags.push('<span class="tag">Geflogen von '+esc(f.op)+'</span>');
+  var links='';
+  if(f.lk)links+='<a class="lk" href="'+f.lk[1]+'" target="_blank" rel="noopener">'+esc(f.lk[0])+'</a>';
+  if(f.lk2)links+='<a class="lk" href="'+f.lk2[1]+'" target="_blank" rel="noopener">'+esc(f.lk2[0])+'</a>';
+  var nd=f.a>f.d?'<sup>+1</sup>':'';
+  return '<article class="pass"><div class="pb"><span>'+esc(f.air)+'</span><b>'+esc(f.no||'Nummer offen')+(f.no2?' + '+esc(f.no2):'')+'</b></div>'+
+   '<div class="pm"><div class="pc"><b>'+f.from+'</b><span>'+esc(APC[f.from])+'</span><em>'+f.dt+'</em></div><div class="px"><div class="pl">'+ico('plane',18)+'</div><small>'+dur(d)+'</small></div><div class="pc r"><b>'+f.to+'</b><span>'+esc(APC[f.to])+'</span><em>'+f.at+nd+'</em></div></div>'+
+   '<div class="pd">'+dLabel(f.d)+(dz?' · '+(dz>0?'+':'')+dz+' Std Zeitverschiebung':'')+'</div>'+
+   '<div class="pcut"><i></i><b></b><i></i></div>'+
+   '<div class="ps"><div class="tags">'+tags.join('')+'</div>'+(links?'<div class="plk">'+links+'</div>':'')+fsChip(f)+radarChip(f)+(f.no||f.no2?'':'<div class="tags" style="margin-top:8px"></div>')+trackLinks(f)+'</div></article>';
+}
+function keyCard(h){
+  var n=nightsBetween(h.ci,h.co),c=cCol(defaultCity(h.ci));
+  return '<article class="keyc" style="--c:'+c+'"><small>'+dShort(h.ci)+' bis '+dShort(h.co)+' · '+n+(n===1?' Nacht':' Nächte')+'</small><h3>'+esc(h.name)+'</h3>'+(h.area?'<span class="ka">'+esc(h.area)+'</span>':'')+(h.note?'<span class="ka">'+esc(h.note)+'</span>':'')+'<div class="kf"><span class="st ok">Bestätigt</span><b>'+chf(h.price)+'</b></div></article>';
+}
+function selectDay(d){
+  vDay=d;
+  var ag=$('#agendaBox');if(ag)ag.innerHTML=agendaHTML(d);
+  var r=$('#rail');if(r){[].forEach.call(r.querySelectorAll('.dy'),function(b){var on=b.dataset.day===d;b.classList.toggle('on',on);b.setAttribute('aria-selected',on);});}
+}
+function renderTimeline(){
+  var items=state.items;
+  if(!vDay){var t=zrhDate(Date.now());vDay=(t>=FIRST&&t<=LAST)?t:FIRST;}
+  var keep=$('#rail')?$('#rail').scrollLeft:null;
+  var h=demoBanner()+vipHTML()+liveBanner()+'<div class="sec">Reiseprogramm</div>'+railHTML()+'<div id="agendaBox">'+agendaHTML(vDay)+'</div>'+
+   reminderHTML()+
+   '<div class="sec">Flüge <span class="n">'+F.length+'</span></div><div class="wallet">'+F.map(passCard).join('')+'</div>'+
+   '<div class="sec">Unterkünfte <span class="n">'+Object.keys(STAYS).length+'</span></div><div class="wallet">'+Object.keys(STAYS).map(function(k){return keyCard(STAYS[k]);}).join('')+'</div>'+
+   hintsHTML()+'<div class="sec">Vorbereitung</div>'+prepCard();
+  $('#tl').innerHTML=h;
+  var r=$('#rail');if(r){if(keep!==null)r.scrollLeft=keep;else{var on=r.querySelector('.on');if(on)r.scrollLeft=Math.max(0,on.offsetLeft-r.clientWidth/2+on.offsetWidth/2);}}
+}
+document.addEventListener('click',function(ev){var b=ev.target.closest('[data-day]');if(b)selectDay(b.dataset.day);});
 
 /* ---------- Hinzufügen ---------- */
 var editingId=null,cityTouched=false;
@@ -1548,7 +1700,7 @@ $('#resetBtn').addEventListener('click',function(){
 window.addEventListener('hashchange',function(){show(location.hash.replace('#',''));});
 
 /* ---------- Start ---------- */
-$('#tab-timeline').innerHTML=ico('list',20)+'<span>Timeline</span>';
+$('#tab-timeline').innerHTML=ico('list',20)+'<span>Reise</span>';
 $('#tab-must').innerHTML=ico('compass',20)+'<span>Must do</span>';
 $('#tab-add').innerHTML=ico('plus',20)+'<span>Hinzufügen</span>';
 $('#tab-overview').innerHTML=ico('grid',20)+'<span>Übersicht</span>';

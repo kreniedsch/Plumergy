@@ -1,5 +1,5 @@
 // Thaiysia V2 Offline-Cache. Bei Änderungen an der App VERSION erhöhen.
-var VERSION='thaiysia-v2-1';
+var VERSION='thaiysia-v2-2';
 var CORE=['./','index.html','manifest.json','icon-192.png','icon-512.png','apple-touch-icon.png'];
 self.addEventListener('install',function(e){
   e.waitUntil(caches.open(VERSION).then(function(c){return c.addAll(CORE);}).then(function(){return self.skipWaiting();}));
