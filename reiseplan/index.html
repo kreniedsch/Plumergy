@@ -4,13 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
-<title>Reiseplan Malaysia Thailand</title>
+<title>Thaiysia</title>
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0C9E92">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Reiseplan">
+<meta name="apple-mobile-web-app-title" content="Thaiysia">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -1236,7 +1236,7 @@ function heroHTML(){
   var nights=SEGS.reduce(function(a,s){return a+nightsBetween(s.stayObjs[0].ci,s.stayObjs[s.stayObjs.length-1].co);},0);
   var bar=SEGS.map(function(s){var n=nightsBetween(s.stayObjs[0].ci,s.stayObjs[s.stayObjs.length-1].co);return '<i style="--c:'+s.color+';flex:'+n+'"></i>';}).join('');
   var lab=SEGS.map(function(s){var n=nightsBetween(s.stayObjs[0].ci,s.stayObjs[s.stayObjs.length-1].co);return '<span style="flex:'+n+'">'+esc(s.city.replace('Kuala Lumpur','KL'))+'</span>';}).join('');
-  return '<section class="hero"><div class="hbg"><div class="hin">'+STARS+'<h1>Malaysia und Thailand</h1><div class="dates">13. bis 27. Nov 2026 · 4 Reisende</div>'+cdHTML()+'</div><div class="art">'+ART.hero+'</div></div><div class="low">'+
+  return '<section class="hero"><div class="hbg"><div class="hin">'+STARS+'<h1>Thaiysia</h1><div class="dates">13. bis 27. Nov 2026 · 4 Reisende</div>'+cdHTML()+'</div><div class="art">'+ART.hero+'</div></div><div class="low">'+
     '<div class="route" aria-hidden="true">'+bar+'</div><div class="routelab">'+lab+'</div>'+
     '<div class="stats"><div class="stat"><b>'+nights+'</b><span>Nächte</span></div><div class="stat"><b>'+F.length+'</b><span>Flüge</span></div><div class="stat"><b>'+SEGS.length+'</b><span>Stationen</span></div></div></div></section>';
 }
